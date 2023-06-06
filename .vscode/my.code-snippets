@@ -1,0 +1,10 @@
+{
+	"Consolelog": {
+		"scope": "javascript,typescript",
+		"prefix": "_log",
+		"body": [
+			"console.log('=$RANDOM_HEX=',${1:Переменная})"
+		],
+		"description": "Лог с рандомным указателем"
+	}
+}
