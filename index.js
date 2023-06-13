@@ -50,4 +50,13 @@ const load = async function (micro) {
     display(tmp)
 }
 
-export { Cemjsx, load }
+const initMap = async function (tmp) {
+    console.log('=e37e54=', tmp)
+    for (let item of tmp.microFrontends) {
+        let t1 = await import(`http://127.0.0.1:8000/assets/js/${item.name}.js`)
+        load(t1.micro)
+        console.log('=ae9b93=', t1.micro)
+    }
+}
+
+export { Cemjsx, load, initMap }
