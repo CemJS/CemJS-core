@@ -58,9 +58,9 @@ const initMap = async function (tmp) {
         let link = document.createElement('link');
         link.rel = 'stylesheet';
         link.type = 'text/css';
-        link.href = item.css;
+        link.href = item?.path?.css;
         head.appendChild(link);
-        microFrontend = await import(item.js)
+        microFrontend = await import(item?.path?.js)
         load(microFrontend.micro)
     }
 }
