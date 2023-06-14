@@ -2,6 +2,10 @@ interface Static {
     [elemName: string]: any;
 }
 
+interface CEM {
+    [elemName: string]: any;
+}
+
 interface Map {
     [elemName: string]: any;
 }
@@ -25,3 +29,5 @@ export declare function Cemjsx(tag: String, data: any, ...children: any[]): jsxR
 export declare function load(micro: Micro): void
 
 export declare function initMap(micro: Map): void
+
+export declare let CEM: CEM
