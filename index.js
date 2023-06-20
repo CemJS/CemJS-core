@@ -1,5 +1,58 @@
 let CEM = {}
 
+
+class Static {
+    constructor(name) {
+        this._name = name
+    }
+}
+
+class Frontends {
+
+    static lists = {}
+
+    constructor(micro) {
+        this.name = micro.name
+        this.loader = micro.loader
+        this.display = micro.display
+        this.Static = new Static(this.name)
+        Frontends.lists[this.name] = this
+    }
+
+    get name() {
+        return this._name
+    }
+
+    set name(value) {
+        this._name = value
+    }
+
+    async init() {
+        if (!this._VDom) {
+            await this.loader()
+        }
+        this._VDomObj = await this.display()
+        this._VDom = display(this._VDomObj, this._VDom)
+    }
+
+}
+
+
+const display = (_VDomObj, $el) => {
+    const newDom = createElement(_VDomObj)
+    if (!$el) {
+        const $app = document.getElementById("app")
+        $app.appendChild(newDom)
+    } else {
+        $el.removeChild(
+            $el.childNodes[1]
+        )
+    }
+
+    return newDom
+}
+
+
 const setDataElement = function (data, $el) {
     if (!data) { return }
 
@@ -34,11 +87,7 @@ const createElement = function (node) {
     return $el
 }
 
-const display = (node) => {
-    const $app = document.getElementById("app")
-    const newDom = createElement(node)
-    $app.appendChild(newDom)
-}
+
 
 
 const Cemjsx = (tag, data, ...children) => {
@@ -46,10 +95,9 @@ const Cemjsx = (tag, data, ...children) => {
 }
 
 const load = async function (micro) {
-    micro.Static = {}
-    await micro.loader()
-    const tmp = await micro.display()
-    display(tmp)
+    const frontend = new Frontends(micro)
+    frontend.init()
+    return
 }
 
 const initMap = async function (tmp) {
