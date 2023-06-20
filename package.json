@@ -1,6 +1,6 @@
 {
   "name": "cemjs-core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "CemJS is a great choice for developers who want to create effective web applications.",
   "keywords": [
     "cemjs",
@@ -14,8 +14,5 @@
   "repository": "https://github.com/CemJS/Core",
   "type": "module",
   "types": "./index.d.ts",
-  "scripts": {
-    "start": "node index"
-  },
   "dependencies": {}
 }
