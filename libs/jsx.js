@@ -117,7 +117,7 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
 
     if (checkNofing(_VDomActual)) {
         $el.appendChild(
-            createElement(_VDomNew, Ref)
+            createElement(_VDomNew, Data)
         );
         return
     }
@@ -138,13 +138,13 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
 
     if (!_VDomNew?.tag) {
         if (_VDomNew != _VDomActual) {
-            $el.replaceChild(createElement(_VDomNew, Ref), $el.childNodes[position])
+            $el.replaceChild(createElement(_VDomNew, Data), $el.childNodes[position])
         }
         return
     }
 
     if (_VDomNew.tag != _VDomActual?.tag) {
-        $el.childNodes[position].replaceWith(createElement(_VDomNew, Ref))
+        $el.childNodes[position].replaceWith(createElement(_VDomNew, Data))
         return
     }
 
