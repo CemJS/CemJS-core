@@ -1,10 +1,4 @@
 const Cemjsx = (tag, data, ...children) => {
-    // console.log('=5af7d7=', this)
-    // console.log('=c68c31=', tag, data, children)
-    // if (typeof tag == "function") {
-    //     // console.log('=0bd458 function=', tag, data)
-    //     console.log('=4ce917=', tag())
-    // }
     children = children.filter(item => !checkNofing(item))
     let joinchildren = []
     let tmp = ""
@@ -14,7 +8,11 @@ const Cemjsx = (tag, data, ...children) => {
                 joinchildren.push(tmp)
                 tmp = ""
             }
-            joinchildren.push(item)
+            if (Array.isArray(item)) {
+                joinchildren.push(...item)
+            } else {
+                joinchildren.push(item)
+            }
         } else {
             tmp += item.toString()
         }
