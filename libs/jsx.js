@@ -1,4 +1,10 @@
 const Cemjsx = (tag, data, ...children) => {
+    // console.log('=5af7d7=', this)
+    // console.log('=c68c31=', tag, data, children)
+    // if (typeof tag == "function") {
+    //     // console.log('=0bd458 function=', tag, data)
+    //     console.log('=4ce917=', tag())
+    // }
     children = children.filter(item => !checkNofing(item))
     let joinchildren = []
     let tmp = ""
@@ -16,6 +22,7 @@ const Cemjsx = (tag, data, ...children) => {
     if (tmp != "") {
         joinchildren.push(tmp)
     }
+
     return { tag, data, children: joinchildren }
 }
 
@@ -79,22 +86,26 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Ref) {
     });
 }
 
-const createElement = function (node, Ref) {
+const createElement = function (node, Data) {
     if (checkNofing(node)) {
         return null
     }
     if (typeof node != "object") {
         return document.createTextNode(node)
     }
+    if (typeof node.tag == "function") {
+        let tempNode = node.tag.bind(Data)(node.data, node.children)
+        node = tempNode
+    }
     let $el = document.createElement(node.tag)
     node.$el = $el
-    if (node.data?.ref && Ref) {
-        Ref[node.data?.ref] = $el
+    if (node.data?.ref && Data.Ref) {
+        Data.Ref[node.data?.ref] = $el
     }
     setDataElement(node.data, $el)
     if (typeof node.children == "object") {
         node.children
-            .map(item => createElement(item, Ref))
+            .map(item => createElement(item, Data))
             .filter(item => !checkNofing(item))
             .forEach($el.appendChild.bind($el));
     } else {
@@ -103,7 +114,8 @@ const createElement = function (node, Ref) {
     return $el
 }
 
-const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, Ref) {
+const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, Data) {
+    let { Ref } = Data
 
     if (checkNofing(_VDomActual)) {
         $el.appendChild(
@@ -152,21 +164,20 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
             _VDomNew.children[i],
             _VDomActual.children[i],
             i,
-            Ref
+            Data
         )
     }
 }
 
 
-const display = (_VDomNew, _VDomActual, $el, Ref) => {
+const display = (_VDomNew, _VDomActual, $el, Data) => {
     if (!$el) {
-        const newDom = createElement(_VDomNew, Ref)
+        const newDom = createElement(_VDomNew, Data)
         const $app = document.getElementById("app")
         $app.appendChild(newDom)
         return newDom
     }
-
-    updateElement($el, _VDomNew, _VDomActual, Ref)
+    updateElement($el, _VDomNew, _VDomActual, 0, Data)
     return $el
 }
 

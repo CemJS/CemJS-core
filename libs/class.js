@@ -72,12 +72,11 @@ class Frontends {
     }
 
     async init() {
-
         if (!this._VDomActual) {
             await this.loader()
         }
         this._VDomNew = await this.display()
-        this.$el = display(this._VDomNew, this._VDomActual, this.$el, this.Ref)
+        this.$el = display(this._VDomNew, this._VDomActual, this.$el, this)
         this._VDomActual = this._VDomNew
     }
 
