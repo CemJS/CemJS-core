@@ -2,8 +2,14 @@ const Cemjsx = (tag, data, ...children) => {
     return { tag, data, children }
 }
 
+const checkDifferent = function (data, data2) {
+    if (data?.toString() == data2?.toString()) {
+        return false
+    }
+    return true
+}
 const checkNofing = function (data) {
-    if (!data && typeof data != "number") {
+    if ((!data && typeof data != "number") || data === true) {
         return true
     }
     return false
@@ -14,14 +20,50 @@ const setDataElement = function (data, $el) {
         if (name.startsWith('on') && name.toLowerCase() in window) {
             $el.addEventListener(name.toLowerCase().substring(2), value)
         } else {
+            if (typeof value == "object") {
+                if (name == "class") {
+                    value = value.join(" ")
+                }
+            }
             $el.setAttribute(name, value)
         }
     })
     return
 }
 
+const updateDataElement = function ($el, newData = {}, oldData = {}) {
+    const data = Object.assign({}, newData, oldData);
+    Object.keys(Object.assign({}, newData, oldData)).forEach(name => {
+
+        if (checkDifferent(newData[name], oldData[name])) {
+
+            if (name in oldData && name.startsWith('on') && name.toLowerCase() in window) {
+                $el.removeEventListener(name.toLowerCase().substring(2), oldData[name])
+            }
+
+            if (name in newData) {
+                if (name.startsWith('on') && name.toLowerCase() in window) {
+                    $el.addEventListener(name.toLowerCase().substring(2), newData[name])
+                } else {
+                    if (typeof newData[name] == "object") {
+                        if (name == "class") {
+                            newData[name] = newData[name].join(" ")
+                        }
+                    }
+                    $el.setAttribute(name, newData[name])
+                }
+            } else {
+                $el?.removeAttribute(name);
+            }
+        }
+    });
+}
+
 const createElement = function (node) {
-    if (typeof node != "object" || node === null) {
+    if (checkNofing(node)) {
+        return null
+    }
+    if (typeof node != "object") {
         return document.createTextNode(node)
     }
     let $el = document.createElement(node.tag)
@@ -30,6 +72,7 @@ const createElement = function (node) {
     if (typeof node.children == "object") {
         node.children
             .map(createElement)
+            .filter(item => !checkNofing(item))
             .forEach($el.appendChild.bind($el));
     } else {
         return document.createTextNode(node.tag)
@@ -38,7 +81,6 @@ const createElement = function (node) {
 }
 
 const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) {
-    // console.log('=a65f2c=', typeof _VDomActual, $el, _VDomNew, _VDomActual, position)
 
     if (checkNofing(_VDomActual)) {
         console.log('=94f5e6= нет актуального', $el, _VDomNew, _VDomActual, position)
@@ -58,19 +100,27 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) 
 
     if (!_VDomNew?.tag) {
         if (_VDomNew != _VDomActual) {
-            $el.replaceWith(createElement(_VDomNew))
+            console.log('=94f5e6= нет тега и он не равен', $el, _VDomNew, _VDomActual, position)
+            $el.replaceChild(createElement(_VDomNew), $el.childNodes[position])
         }
-        console.log('=94f5e6= нет тега', $el, _VDomNew, _VDomActual, position)
         return
     }
+
+    if (_VDomNew.tag != _VDomActual?.tag) {
+        $el.childNodes[position].replaceWith(createElement(_VDomNew))
+        return
+    }
+
 
     if (!$el) {
         console.log('=d9f996=', "no el", $el, _VDomNew, _VDomActual, position)
         return
     }
-    for (let i = 0; i < _VDomNew.children.length || i < _VDomActual.children.length; i++) {
-        // console.log('=2ef759=', $el?.childNodes, _VDomActual.children[i], position, i)
 
+    updateDataElement($el.childNodes[position], _VDomNew?.data, _VDomActual?.data)
+    _VDomNew.$el = _VDomActual.$el
+
+    for (let i = 0; i < _VDomNew.children.length || i < _VDomActual.children.length; i++) {
         updateElement(
             _VDomActual.$el,
             _VDomNew.children[i],
@@ -78,7 +128,6 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) 
             i
         )
     }
-
 }
 
 
