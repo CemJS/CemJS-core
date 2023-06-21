@@ -46,11 +46,12 @@ class Frontends {
                 });
                 this.Static.__defineSetter__(item, function (value) {
                     if (fn && fn(value, item)) {
+                        this[`_${item}`] = value;
                         init()
                     } else if (!fn && checkDifferent(this[`_${item}`], value)) {
+                        this[`_${item}`] = value;
                         init()
                     }
-                    this[`_${item}`] = value;
                 });
             }
         } else {
@@ -62,11 +63,12 @@ class Frontends {
             });
             this.Static.__defineSetter__(keys, function (value) {
                 if (fn && fn(value, keys)) {
+                    this[`_${keys}`] = value;
                     init()
                 } else if (!fn && checkDifferent(this[`_${keys}`], value)) {
+                    this[`_${keys}`] = value;
                     init()
                 }
-                this[`_${keys}`] = value;
             });
         }
     }
