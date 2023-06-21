@@ -1,4 +1,5 @@
 const Cemjsx = (tag, data, ...children) => {
+    children = children.filter(item => !checkNofing(item))
     return { tag, data, children }
 }
 
@@ -8,12 +9,14 @@ const checkDifferent = function (data, data2) {
     }
     return true
 }
+
 const checkNofing = function (data) {
     if ((!data && typeof data != "number") || data === true) {
         return true
     }
     return false
 }
+
 const setDataElement = function (data, $el) {
     if (!data) { return }
     Object.entries(data).forEach(([name, value]) => {
@@ -32,15 +35,11 @@ const setDataElement = function (data, $el) {
 }
 
 const updateDataElement = function ($el, newData = {}, oldData = {}) {
-    const data = Object.assign({}, newData, oldData);
     Object.keys(Object.assign({}, newData, oldData)).forEach(name => {
-
         if (checkDifferent(newData[name], oldData[name])) {
-
             if (name in oldData && name.startsWith('on') && name.toLowerCase() in window) {
                 $el.removeEventListener(name.toLowerCase().substring(2), oldData[name])
             }
-
             if (name in newData) {
                 if (name.startsWith('on') && name.toLowerCase() in window) {
                     $el.addEventListener(name.toLowerCase().substring(2), newData[name])
@@ -83,7 +82,6 @@ const createElement = function (node) {
 const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) {
 
     if (checkNofing(_VDomActual)) {
-        console.log('=94f5e6= нет актуального', $el, _VDomNew, _VDomActual, position)
         $el.appendChild(
             createElement(_VDomNew)
         );
@@ -91,7 +89,6 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) 
     }
 
     if (checkNofing(_VDomNew)) {
-        console.log('=94f5e6= нет нового', $el, _VDomNew, _VDomActual, position)
         $el.removeChild(
             $el.childNodes[position]
         );
@@ -100,7 +97,6 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) 
 
     if (!_VDomNew?.tag) {
         if (_VDomNew != _VDomActual) {
-            console.log('=94f5e6= нет тега и он не равен', $el, _VDomNew, _VDomActual, position)
             $el.replaceChild(createElement(_VDomNew), $el.childNodes[position])
         }
         return
@@ -111,9 +107,8 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) 
         return
     }
 
-
     if (!$el) {
-        console.log('=d9f996=', "no el", $el, _VDomNew, _VDomActual, position)
+        console.error('UpdateElement нет значения $el')
         return
     }
 
@@ -132,6 +127,7 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0) 
 
 
 const display = (_VDomNew, _VDomActual, $el) => {
+
     if (!$el) {
         const newDom = createElement(_VDomNew)
         const $app = document.getElementById("app")
