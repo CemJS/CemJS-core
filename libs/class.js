@@ -7,6 +7,23 @@ const checkDifferent = function (data, data2) {
     return true
 }
 
+const VDomStartFn = function (_VDomNew, Data) {
+    if (typeof _VDomNew != "object") {
+        return _VDomNew
+    }
+    let tmp = { tag: _VDomNew.tag, data: _VDomNew.data, children: _VDomNew.children }
+    if (typeof tmp.tag == "function") {
+        let tmpp = VDomStartFn(tmp.tag.bind(Data)(), Data)
+        return tmpp
+    }
+    if (tmp.children) {
+        tmp.children.forEach((item, index) => {
+            tmp.children[index] = VDomStartFn(tmp.children[index], Data)
+        })
+    }
+    return tmp
+}
+
 class Static {
     constructor(name) {
         this._name = name
@@ -77,7 +94,7 @@ class Frontends {
         if (!this._VDomActual) {
             await this.loader()
         }
-        this._VDomNew = await this.display()
+        this._VDomNew = VDomStartFn(await this.display(), this)
         this.$el = display(this._VDomNew, this._VDomActual, this.$el, this)
         this._VDomActual = this._VDomNew
     }
