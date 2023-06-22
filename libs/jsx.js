@@ -1,4 +1,5 @@
 const Cemjsx = (tag, data, ...children) => {
+    // console.log('=9b6ee4=', this)
     children = children.filter(item => !checkNofing(item))
     let joinchildren = []
     let tmp = ""
@@ -22,6 +23,14 @@ const Cemjsx = (tag, data, ...children) => {
     }
 
     return { tag, data, children: joinchildren }
+}
+
+const checkNodeTag = function (node, Data) {
+    let tempNode = node.tag.bind(Data)(node.data, node.children)
+    if (typeof tempNode?.tag == "function") {
+        return checkNodeTag(tempNode, Data)
+    }
+    return tempNode
 }
 
 const checkDifferent = function (data, data2) {
@@ -92,7 +101,7 @@ const createElement = function (node, Data) {
         return document.createTextNode(node)
     }
     if (typeof node.tag == "function") {
-        let tempNode = node.tag.bind(Data)(node.data, node.children)
+        let tempNode = checkNodeTag(node, Data)
         node = tempNode
     }
     let $el = document.createElement(node.tag)
@@ -143,6 +152,16 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
         return
     }
 
+    // if (typeof _VDomNew.tag == "function") {
+    //     let tempNode = checkNodeTag(_VDomNew, Data)
+    //     _VDomNew = tempNode
+    // }
+
+    // if (typeof _VDomActual.tag == "function") {
+    //     let tempNode = checkNodeTag(_VDomActual, Data)
+    //     _VDomActual = tempNode
+    // }
+
     if (_VDomNew.tag != _VDomActual?.tag) {
         $el.childNodes[position].replaceWith(createElement(_VDomNew, Data))
         return
@@ -152,6 +171,9 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
         console.error('UpdateElement нет значения $el')
         return
     }
+
+
+    // console.log('=d0aafc=', $el, _VDomNew, _VDomActual)
 
     updateDataElement($el.childNodes[position], _VDomNew?.data, _VDomActual?.data, Ref)
     _VDomNew.$el = _VDomActual.$el
