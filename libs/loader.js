@@ -1,6 +1,13 @@
 import { Frontends } from './class'
-
+let es
 const load = async function (micro) {
+    if (!es) {
+        try {
+            es = new EventSource('/esbuild').addEventListener('change', () => location.reload())
+        } catch (error) {
+            es = true
+        }
+    }
     const frontend = new Frontends(micro)
     frontend.init()
     return
