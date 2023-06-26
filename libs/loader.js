@@ -1,29 +1,34 @@
-import { Frontends } from './class'
-let es
+import { Frontends, pageFront } from './class'
+import { listener } from './listener'
+
+let cemConfig
 const load = async function (micro) {
-    if (!es) {
-        try {
-            es = new EventSource('/esbuild').addEventListener('change', () => location.reload())
-        } catch (error) {
-            es = true
-        }
-    }
     const frontend = new Frontends(micro)
-    frontend.init()
+    // frontend.init()
     return
 }
 
-const initMap = async function (tmp) {
-    for (let item of tmp.microFrontends) {
-        let head = document.getElementsByTagName('head')[0];
-        let link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.href = item?.path?.css;
-        head.appendChild(link);
-        microFrontend = await import(item?.path?.js)
-        load(microFrontend.micro)
+const initMap = async function (config) {
+    new EventSource('/esbuild').addEventListener('change', () => location.reload())
+    listener()
+    cemConfig = config
+    for (let item of config.microFrontends) {
+        if (item?.path?.css) {
+            let head = document.getElementsByTagName('head')[0];
+            let link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = item?.path?.css;
+            head.appendChild(link);
+        }
+        if (item?.path?.js) {
+            let microFrontend = await import(item?.path?.js)
+            microFrontend.micro.name = item.name
+            load(microFrontend.micro)
+        }
     }
+    history.pushState({}, '', window.location.pathname);
+    window.dispatchEvent(new Event('popstate'));
 }
 
-export { load, initMap }
+export { load, initMap, cemConfig, pageFront }
