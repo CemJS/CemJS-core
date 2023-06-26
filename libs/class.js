@@ -1,4 +1,8 @@
 import { display } from './jsx'
+import * as Fn from './fn'
+
+let pageFront = []
+
 
 const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
@@ -39,6 +43,7 @@ class Frontends {
         this.loader = micro.loader
         this.display = micro.display
         this.Static = new Static(this.name)
+        this.Fn = Fn
         this.Ref = {}
         Frontends.lists[this.name] = this
     }
@@ -91,6 +96,9 @@ class Frontends {
     }
 
     async init() {
+        if (!pageFront.includes(this._name)) {
+            pageFront.push(this._name)
+        }
         if (!this._VDomActual) {
             await this.loader()
         }
@@ -101,4 +109,4 @@ class Frontends {
 
 }
 
-export { Static, Frontends }
+export { Static, Frontends, pageFront }
