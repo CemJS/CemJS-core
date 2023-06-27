@@ -26,7 +26,7 @@ interface Micro {
 
 export declare function Cemjsx(tag: String, data: any, ...children: any[]): jsxResult
 
-export declare function load(micro: Micro): void
+export declare function load(micro: Micro, one?: Boolean): void
 
 export declare function initMap(micro: Map): void
 

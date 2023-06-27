@@ -2,9 +2,11 @@ import { Frontends, pageFront } from './class'
 import { listener } from './listener'
 
 let cemConfig
-const load = async function (micro) {
+const load = async function (micro, one) {
     const frontend = new Frontends(micro)
-    // frontend.init()
+    if (one) {
+        frontend.init()
+    }
     return
 }
 
