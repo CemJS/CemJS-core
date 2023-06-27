@@ -1,5 +1,4 @@
 const Cemjsx = (tag, data, ...children) => {
-    // console.log('=9b6ee4=', this)
     children = children.filter(item => !checkNofing(item))
     let joinchildren = []
     let tmp = ""
@@ -152,16 +151,6 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
         return
     }
 
-    // if (typeof _VDomNew.tag == "function") {
-    //     let tempNode = checkNodeTag(_VDomNew, Data)
-    //     _VDomNew = tempNode
-    // }
-
-    // if (typeof _VDomActual.tag == "function") {
-    //     let tempNode = checkNodeTag(_VDomActual, Data)
-    //     _VDomActual = tempNode
-    // }
-
     if (_VDomNew.tag != _VDomActual?.tag) {
         $el.childNodes[position].replaceWith(createElement(_VDomNew, Data))
         return
@@ -171,9 +160,6 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
         console.error('UpdateElement нет значения $el')
         return
     }
-
-
-    // console.log('=d0aafc=', $el, _VDomNew, _VDomActual)
 
     updateDataElement($el.childNodes[position], _VDomNew?.data, _VDomActual?.data, Ref)
     _VDomNew.$el = _VDomActual.$el
