@@ -88,6 +88,13 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Ref) {
             } else {
                 $el?.removeAttribute(name);
             }
+        } else {
+            if (name.startsWith('on') && name.toLowerCase() in window && oldData && oldData[name]) {
+                $el.removeEventListener(name.toLowerCase().substring(2), oldData[name])
+                if (name in newData) {
+                    $el.addEventListener(name.toLowerCase().substring(2), newData[name])
+                }
+            }
         }
     });
 }
