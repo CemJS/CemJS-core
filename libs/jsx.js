@@ -131,9 +131,11 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
     let { Ref } = Data
 
     if (checkNofing(_VDomActual)) {
+       if(_VDomNew){
         $el.appendChild(
             createElement(_VDomNew, Data)
         );
+        }
         return
     }
 
