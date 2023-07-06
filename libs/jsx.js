@@ -46,11 +46,12 @@ const checkNofing = function (data) {
     return false
 }
 
-const setDataElement = function (data, $el) {
+const setDataElement = function (data, $el, Data) {
     if (!data) { return }
     Object.entries(data).forEach(([name, value]) => {
         if (name.startsWith('on') && name.toLowerCase() in window) {
             $el.addEventListener(name.toLowerCase().substring(2), value)
+            Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: value })
         } else if (name == "ref") {
             return
         } else {
@@ -65,35 +66,33 @@ const setDataElement = function (data, $el) {
     return
 }
 
-const updateDataElement = function ($el, newData = {}, oldData = {}, Ref) {
+const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
     Object.keys(Object.assign({}, newData, oldData)).forEach(name => {
+
+        if (name.startsWith('on') && name.toLowerCase() in window && name in oldData) {
+            $el.removeEventListener(name.toLowerCase().substring(2), oldData[name])
+        }
+
+
+        if (name.startsWith('on') && name.toLowerCase() in window && name in newData) {
+            $el.addEventListener(name.toLowerCase().substring(2), newData[name])
+            Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: newData[name] })
+            return
+        }
+
         if (checkDifferent(newData[name], oldData[name])) {
-            if (name in oldData && name.startsWith('on') && name.toLowerCase() in window) {
-                $el.removeEventListener(name.toLowerCase().substring(2), oldData[name])
-            }
             if (name in newData) {
-                if (name.startsWith('on') && name.toLowerCase() in window) {
-                    $el.addEventListener(name.toLowerCase().substring(2), newData[name])
-                } else {
-                    if (name == "ref") {
-                        return
-                    }
-                    if (typeof newData[name] == "object") {
-                        if (name == "class") {
-                            newData[name] = newData[name].join(" ")
-                        }
-                    }
-                    $el.setAttribute(name, newData[name])
+                if (name == "ref") {
+                    return
                 }
+                if (typeof newData[name] == "object") {
+                    if (name == "class") {
+                        newData[name] = newData[name].join(" ")
+                    }
+                }
+                $el.setAttribute(name, newData[name])
             } else {
                 $el?.removeAttribute(name);
-            }
-        } else {
-            if (name.startsWith('on') && name.toLowerCase() in window && oldData && oldData[name]) {
-                $el.removeEventListener(name.toLowerCase().substring(2), oldData[name])
-                if (name in newData) {
-                    $el.addEventListener(name.toLowerCase().substring(2), newData[name])
-                }
             }
         }
     });
@@ -115,7 +114,7 @@ const createElement = function (node, Data) {
     if (node.data?.ref && Data.Ref) {
         Data.Ref[node.data?.ref] = $el
     }
-    setDataElement(node.data, $el)
+    setDataElement(node.data, $el, Data)
     if (typeof node.children == "object") {
         node.children
             .map(item => createElement(item, Data))
@@ -128,13 +127,12 @@ const createElement = function (node, Data) {
 }
 
 const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, Data) {
-    let { Ref } = Data
 
     if (checkNofing(_VDomActual)) {
-       if(_VDomNew){
-        $el.appendChild(
-            createElement(_VDomNew, Data)
-        );
+        if (_VDomNew) {
+            $el.appendChild(
+                createElement(_VDomNew, Data)
+            );
         }
         return
     }
@@ -170,7 +168,14 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
         return
     }
 
-    updateDataElement($el.childNodes[position], _VDomNew?.data, _VDomActual?.data, Ref)
+    let eventIndex = Data._ListsEventListener.findIndex(item => $el.childNodes[position] === item?.$el)
+    if (eventIndex >= 0) {
+        let item = Data._ListsEventListener[eventIndex]
+        item.$el.removeEventListener(item.name, item.fn)
+        Data._ListsEventListener.splice(eventIndex, 1)
+    }
+
+    updateDataElement($el.childNodes[position], _VDomNew?.data, _VDomActual?.data, Data)
     _VDomNew.$el = _VDomActual.$el
 
     for (let i = 0; i < _VDomNew.children.length || i < _VDomActual.children.length; i++) {
