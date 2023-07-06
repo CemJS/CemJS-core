@@ -97,7 +97,7 @@ class Frontends {
         }
     }
 
-    async init() {
+    async init(index) {
         if (!pageFront.includes(this.name)) {
             pageFront.push(this.name)
         }
@@ -105,7 +105,7 @@ class Frontends {
             await this.loader()
         }
         this._VDomNew = VDomStartFn(await this.display(), this)
-        this.$el = display(this._VDomNew, this._VDomActual, this.$el, this)
+        this.$el = display(this._VDomNew, this._VDomActual, this.$el, this, index)
         this._VDomActual = this._VDomNew
 
 

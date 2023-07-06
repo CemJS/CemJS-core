@@ -190,11 +190,15 @@ const updateElement = async function ($el, _VDomNew, _VDomActual, position = 0, 
 }
 
 
-const display = (_VDomNew, _VDomActual, $el, Data) => {
+const display = (_VDomNew, _VDomActual, $el, Data, index) => {
     if (!$el) {
         const newDom = createElement(_VDomNew, Data)
         const $app = document.getElementById("app")
-        $app.appendChild(newDom)
+        if ($app.childNodes.length > index) {
+            $app.insertBefore(newDom, $app.childNodes[index + 1])
+        } else {
+            $app.appendChild(newDom)
+        }
         return newDom
     }
     updateElement($el, _VDomNew, _VDomActual, 0, Data)

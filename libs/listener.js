@@ -12,11 +12,11 @@ const changeUrl = async function (e) {
                 }
             }
 
-            for (let page of item.front) {
+            item.front.map((page, index) => {
                 if (Frontends.lists[page]) {
-                    Frontends.lists[page].init()
+                    Frontends.lists[page].init(index)
                 }
-            }
+            })
         }
     }
 }
