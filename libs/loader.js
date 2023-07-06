@@ -27,7 +27,7 @@ const initMap = async function (config) {
         if (config.microFrontends[key]?.path?.js) {
             let microFrontend = await import(config.microFrontends[key]?.path?.js)
             microFrontend.micro.name = config.microFrontends[key].name
-            load(microFrontend.micro)
+            load(microFrontend.micro, config.microFrontends[key].one)
         }
     }
     history.pushState({}, '', window.location.pathname);
