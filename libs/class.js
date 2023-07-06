@@ -42,9 +42,23 @@ class Frontends {
         this.Fn = Fn
         this.Ref = {}
         this._ListsEventListener = []
+        this._ListsEventSource = []
+
         Frontends.lists[this.name] = this
     }
 
+
+    eventSource(url, fn) {
+        let tmp = new EventSource(url)
+        tmp.addEventListener('open', (e) => {
+            console.log("eventSource", e)
+        })
+        tmp.addEventListener('message', fn)
+        tmp.addEventListener('error', (error) => {
+            console.error("eventSource", error)
+        })
+        this._ListsEventSource.push(tmp)
+    }
 
     clearData() {
         delete this.$el
@@ -54,6 +68,10 @@ class Frontends {
         this.Ref = {}
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
             item.$el.removeEventListener(item.name, item.fn)
+            return false
+        })
+        this._ListsEventSource = this._ListsEventSource.filter((item) => {
+            item.close()
             return false
         })
     }
