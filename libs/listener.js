@@ -7,7 +7,7 @@ const changeUrl = async function (e) {
 
             for (let olPage of pageFront) {
                 if (!item.front.includes(olPage)) {
-                    Frontends.lists[olPage].$el.remove()
+                    Frontends.lists[olPage]?.$el?.remove()
                     Frontends.lists[olPage].clearData()
                 }
             }

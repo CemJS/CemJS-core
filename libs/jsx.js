@@ -195,7 +195,7 @@ const display = (_VDomNew, _VDomActual, $el, Data, index) => {
         const newDom = createElement(_VDomNew, Data)
         const $app = document.getElementById("app")
         if ($app.childNodes.length > index) {
-            $app.insertBefore(newDom, $app.childNodes[index + 1])
+            $app.insertBefore(newDom, $app.childNodes[index])
         } else {
             $app.appendChild(newDom)
         }
