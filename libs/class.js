@@ -98,8 +98,8 @@ class Frontends {
     }
 
     async init() {
-        if (!pageFront.includes(this._name)) {
-            pageFront.push(this._name)
+        if (!pageFront.includes(this.name)) {
+            pageFront.push(this.name)
         }
         if (!this._VDomActual) {
             await this.loader()
