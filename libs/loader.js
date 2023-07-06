@@ -5,6 +5,7 @@ let cemConfig
 const load = async function (micro, one) {
     const frontend = new Frontends(micro)
     if (one) {
+        new EventSource('/esbuild').addEventListener('change', () => location.reload())
         frontend.init()
     }
     return

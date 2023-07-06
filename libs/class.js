@@ -28,11 +28,7 @@ const VDomStartFn = function (_VDomNew, Data) {
     return tmp
 }
 
-class Static {
-    constructor(name) {
-        this._name = name
-    }
-}
+
 
 class Frontends {
 
@@ -42,18 +38,24 @@ class Frontends {
         this.name = micro.name
         this.loader = micro.loader
         this.display = micro.display
-        this.Static = new Static(this.name)
+        this.Static = { name: this.name }
         this.Fn = Fn
         this.Ref = {}
+        this._ListsEventListener = []
         Frontends.lists[this.name] = this
     }
 
-    get name() {
-        return this._name
-    }
 
-    set name(value) {
-        this._name = value
+    clearData() {
+        delete this.$el
+        delete this._VDomNew
+        delete this._VDomActual
+        this.Static = { name: this.name }
+        this.Ref = {}
+        this._ListsEventListener = this._ListsEventListener.filter((item) => {
+            item.$el.removeEventListener(item.name, item.fn)
+            return false
+        })
     }
 
     initAuto(keys, fn) {
@@ -105,8 +107,17 @@ class Frontends {
         this._VDomNew = VDomStartFn(await this.display(), this)
         this.$el = display(this._VDomNew, this._VDomActual, this.$el, this)
         this._VDomActual = this._VDomNew
+
+
+        this._ListsEventListener = this._ListsEventListener.filter((item) => {
+            if (!document.body.contains(item.$el)) {
+                item.$el.removeEventListener(item.name, item.fn)
+                return false
+            }
+            return true
+        })
     }
 
 }
 
-export { Static, Frontends, pageFront }
+export { Frontends, pageFront }
