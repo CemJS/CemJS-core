@@ -1,8 +1,16 @@
 import { display } from './jsx'
 import * as Fn from './fn'
 
-let pageFront = []
+const pageFront = []
+const Services = {}
+const Variable = {}
 
+const sendOn = function (name, ...data) {
+
+    if (this._LostsOn[name]) {
+        this._LostsOn[name].bind(this)(...data)
+    }
+}
 
 const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
@@ -40,11 +48,40 @@ class Frontends {
         this.display = micro.display
         this.Static = { name: this.name }
         this.Fn = Fn
+        this.Services = Services
+        this.Variable = Variable
         this.Ref = {}
         this._ListsEventListener = []
+        this._ListsEventSource = []
+        this._LostsOn = {}
         Frontends.lists[this.name] = this
     }
 
+    on(name, callback) {
+        if (typeof callback == "function") {
+            this._LostsOn[name] = callback
+        }
+    }
+
+    services(name, ...data) {
+        let [serv, key] = name.split(".")
+        if (this.Services[serv] && typeof this.Services[serv][key] == "function") {
+            return this.Services[serv][key].bind(this)(...data)
+        }
+        return null
+    }
+
+    eventSource(url, fn) {
+        let tmp = new EventSource(url)
+        tmp.addEventListener('open', (e) => {
+            console.log("eventSource", e)
+        })
+        tmp.addEventListener('message', fn)
+        tmp.addEventListener('error', (error) => {
+            console.error("eventSource", error)
+        })
+        this._ListsEventSource.push(tmp)
+    }
 
     clearData() {
         delete this.$el
@@ -54,6 +91,10 @@ class Frontends {
         this.Ref = {}
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
             item.$el.removeEventListener(item.name, item.fn)
+            return false
+        })
+        this._ListsEventSource = this._ListsEventSource.filter((item) => {
+            item.close()
             return false
         })
     }
@@ -97,7 +138,9 @@ class Frontends {
         }
     }
 
-    async init() {
+    async init(index) {
+        sendOn.bind(this)("start", "Start init!", this.name)
+
         if (!pageFront.includes(this.name)) {
             pageFront.push(this.name)
         }
@@ -105,10 +148,8 @@ class Frontends {
             await this.loader()
         }
         this._VDomNew = VDomStartFn(await this.display(), this)
-        this.$el = display(this._VDomNew, this._VDomActual, this.$el, this)
+        this.$el = display(this._VDomNew, this._VDomActual, this.$el, this, index)
         this._VDomActual = this._VDomNew
-
-
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
             if (!document.body.contains(item.$el)) {
                 item.$el.removeEventListener(item.name, item.fn)
@@ -116,8 +157,10 @@ class Frontends {
             }
             return true
         })
+        sendOn.bind(this)("finish", "Finish init!", this.name, 1)
+
     }
 
 }
 
-export { Frontends, pageFront }
+export { Frontends, pageFront, Services, Variable }

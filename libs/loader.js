@@ -1,9 +1,14 @@
-import { Frontends, pageFront } from './class'
+import { Frontends, Services, Variable } from './class'
 import { listener } from './listener'
 
 let cemConfig
 const load = async function (micro, one) {
     const frontend = new Frontends(micro)
+    if (micro.listener) {
+        for (let key in micro.listener) {
+            frontend.on(key, micro.listener[key])
+        }
+    }
     if (one) {
         if (one === true) {
             new EventSource('/esbuild').addEventListener('change', () => location.reload())
@@ -17,6 +22,15 @@ const initMap = async function (config) {
     new EventSource('/esbuild').addEventListener('change', () => location.reload())
     listener()
     cemConfig = config
+    for (let key in config.services) {
+        if (config.services[key]?.path?.js) {
+            Services[key] = await import(config.services[key]?.path?.js)
+            if (typeof Services[key].loader == "function") {
+                await Services[key].loader(Variable)
+            }
+        }
+    }
+
     for (let key in config.microFrontends) {
         if (config.microFrontends[key]?.path?.css) {
             let head = document.getElementsByTagName('head')[0];
@@ -36,4 +50,4 @@ const initMap = async function (config) {
     window.dispatchEvent(new Event('popstate'));
 }
 
-export { load, initMap, cemConfig, pageFront }
+export { load, initMap, cemConfig }
