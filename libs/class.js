@@ -3,6 +3,7 @@ import * as Fn from './fn'
 
 const pageFront = []
 const Services = {}
+const Variable = {}
 
 const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
@@ -41,12 +42,20 @@ class Frontends {
         this.Static = { name: this.name }
         this.Fn = Fn
         this.Services = Services
+        this.Variable = Variable
         this.Ref = {}
         this._ListsEventListener = []
         this._ListsEventSource = []
         Frontends.lists[this.name] = this
     }
 
+    services(name, ...data) {
+        let [serv, key] = name.split(".")
+        if (this.Services[serv] && typeof this.Services[serv][key] == "function") {
+            return this.Services[serv][key].bind(this)(...data)
+        }
+        return null
+    }
 
     eventSource(url, fn) {
         let tmp = new EventSource(url)
@@ -136,4 +145,4 @@ class Frontends {
 
 }
 
-export { Frontends, pageFront, Services }
+export { Frontends, pageFront, Services, Variable }

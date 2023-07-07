@@ -1,4 +1,4 @@
-import { Frontends, Services } from './class'
+import { Frontends, Services, Variable } from './class'
 import { listener } from './listener'
 
 let cemConfig
@@ -20,11 +20,10 @@ const initMap = async function (config) {
     for (let key in config.services) {
         if (config.services[key]?.path?.js) {
             Services[key] = await import(config.services[key]?.path?.js)
+            if (typeof Services[key].loader == "function") {
+                await Services[key].loader(Variable)
+            }
         }
-    }
-
-    if (Services.functions?.loader) {
-        Services.functions.loader()
     }
 
     for (let key in config.microFrontends) {
