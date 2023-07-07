@@ -1,8 +1,8 @@
 import { display } from './jsx'
 import * as Fn from './fn'
 
-let pageFront = []
-
+const pageFront = []
+const Services = {}
 
 const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
@@ -40,10 +40,10 @@ class Frontends {
         this.display = micro.display
         this.Static = { name: this.name }
         this.Fn = Fn
+        this.Services = Services
         this.Ref = {}
         this._ListsEventListener = []
         this._ListsEventSource = []
-
         Frontends.lists[this.name] = this
     }
 
@@ -125,8 +125,6 @@ class Frontends {
         this._VDomNew = VDomStartFn(await this.display(), this)
         this.$el = display(this._VDomNew, this._VDomActual, this.$el, this, index)
         this._VDomActual = this._VDomNew
-
-
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
             if (!document.body.contains(item.$el)) {
                 item.$el.removeEventListener(item.name, item.fn)
@@ -138,4 +136,4 @@ class Frontends {
 
 }
 
-export { Frontends, pageFront }
+export { Frontends, pageFront, Services }

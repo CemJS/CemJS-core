@@ -1,4 +1,4 @@
-import { Frontends, pageFront } from './class'
+import { Frontends, Services } from './class'
 import { listener } from './listener'
 
 let cemConfig
@@ -17,6 +17,16 @@ const initMap = async function (config) {
     new EventSource('/esbuild').addEventListener('change', () => location.reload())
     listener()
     cemConfig = config
+    for (let key in config.services) {
+        if (config.services[key]?.path?.js) {
+            Services[key] = await import(config.services[key]?.path?.js)
+        }
+    }
+
+    if (Services.functions?.loader) {
+        Services.functions.loader()
+    }
+
     for (let key in config.microFrontends) {
         if (config.microFrontends[key]?.path?.css) {
             let head = document.getElementsByTagName('head')[0];
@@ -36,4 +46,4 @@ const initMap = async function (config) {
     window.dispatchEvent(new Event('popstate'));
 }
 
-export { load, initMap, cemConfig, pageFront }
+export { load, initMap, cemConfig }

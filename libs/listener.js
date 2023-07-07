@@ -5,12 +5,13 @@ const changeUrl = async function (e) {
     for (let item of cemConfig.pages) {
         if (item.url == window.location.pathname) {
 
-            for (let olPage of pageFront) {
+            pageFront.map((olPage, index) => {
                 if (!item.front.includes(olPage)) {
                     Frontends.lists[olPage]?.$el?.remove()
                     Frontends.lists[olPage].clearData()
+                    pageFront.splice(index, 1)
                 }
-            }
+            })
 
             item.front.map((page, index) => {
                 if (Frontends.lists[page]) {
