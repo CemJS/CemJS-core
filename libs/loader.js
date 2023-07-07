@@ -4,6 +4,11 @@ import { listener } from './listener'
 let cemConfig
 const load = async function (micro, one) {
     const frontend = new Frontends(micro)
+    if (micro.listener) {
+        for (let key in micro.listener) {
+            frontend.on(key, micro.listener[key])
+        }
+    }
     if (one) {
         if (one === true) {
             new EventSource('/esbuild').addEventListener('change', () => location.reload())

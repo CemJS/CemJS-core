@@ -5,6 +5,13 @@ const pageFront = []
 const Services = {}
 const Variable = {}
 
+const sendOn = function (name, ...data) {
+
+    if (this._LostsOn[name]) {
+        this._LostsOn[name].bind(this)(...data)
+    }
+}
+
 const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
         return false
@@ -46,7 +53,14 @@ class Frontends {
         this.Ref = {}
         this._ListsEventListener = []
         this._ListsEventSource = []
+        this._LostsOn = {}
         Frontends.lists[this.name] = this
+    }
+
+    on(name, callback) {
+        if (typeof callback == "function") {
+            this._LostsOn[name] = callback
+        }
     }
 
     services(name, ...data) {
@@ -125,6 +139,8 @@ class Frontends {
     }
 
     async init(index) {
+        sendOn.bind(this)("start", "Start init!", this.name)
+
         if (!pageFront.includes(this.name)) {
             pageFront.push(this.name)
         }
@@ -141,6 +157,8 @@ class Frontends {
             }
             return true
         })
+        sendOn.bind(this)("finish", "Finish init!", this.name, 1)
+
     }
 
 }

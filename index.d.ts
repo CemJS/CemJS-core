@@ -20,6 +20,7 @@ interface Micro {
     name: String,
     loader: Function,
     display: Function,
+	listener?: any,
     Static?: Static
 }
 
