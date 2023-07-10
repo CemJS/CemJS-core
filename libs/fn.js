@@ -13,13 +13,19 @@ export const link = function (e) {
     }
 }
 
-export const initOne = function({name,data}){
+export const initOne = function({name,data,ifOpen}){
     if (!Frontends.lists[name]){
         console.error('=d792ce=',"No name =>",name)
         return
     }
 
+    if(Frontends.lists[name].$el){
+       if(ifOpen){
+        ifOpen(Frontends.lists[name])
+        return
+       }
+    }
     Frontends.lists[name].init()
-
+    return
 
 }
