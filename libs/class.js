@@ -84,6 +84,7 @@ class Frontends {
     }
 
     clearData() {
+        this?.$el?.remove()
         delete this.$el
         delete this._VDomNew
         delete this._VDomActual
