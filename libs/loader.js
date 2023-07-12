@@ -22,6 +22,9 @@ const initMap = async function (config) {
     new EventSource('/esbuild').addEventListener('change', () => location.reload())
     listener()
     cemConfig = config
+    if (cemConfig?.api) {
+        Variable._Api = cemConfig.api
+    }
     for (let key in config.services) {
         if (config.services[key]?.path?.js) {
             Services[key] = await import(config.services[key]?.path?.js)

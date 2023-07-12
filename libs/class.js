@@ -72,6 +72,9 @@ class Frontends {
     }
 
     eventSource(url, fn) {
+        if (this.Variable._Api) {
+            url = this.Variable._Api + url
+        }
         let tmp = new EventSource(url)
         tmp.addEventListener('open', (e) => {
             console.log("eventSource", e)
