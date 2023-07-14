@@ -1,7 +1,7 @@
 import { display } from './jsx'
 import * as Fn from './fn'
 
-const pageFront = []
+const pageFront = { lists: [] }
 const Services = {}
 const Variable = {}
 
@@ -76,9 +76,7 @@ class Frontends {
             url = this.Variable._Api + url
         }
         let tmp = new EventSource(url)
-        tmp.addEventListener('open', (e) => {
-            console.log("eventSource", e)
-        })
+        tmp.addEventListener('open', (e) => { })
         tmp.addEventListener('message', fn)
         tmp.addEventListener('error', (error) => {
             console.error("eventSource", error)
@@ -145,8 +143,8 @@ class Frontends {
     async init(index) {
         sendOn.bind(this)("start", "Start init!", this.name)
 
-        if (!pageFront.includes(this.name)) {
-            pageFront.push(this.name)
+        if (!pageFront.lists.includes(this.name)) {
+            pageFront.lists.push(this.name)
         }
         if (!this._VDomActual) {
             await this.loader()

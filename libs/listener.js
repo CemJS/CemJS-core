@@ -4,13 +4,13 @@ import { Frontends, pageFront } from './class'
 const changeUrl = async function (e) {
     for (let item of cemConfig.pages) {
         if (item.url == window.location.pathname) {
-
-            pageFront.map((olPage, index) => {
+            pageFront.lists = pageFront.lists.filter((olPage, index) => {
                 if (!item.front.includes(olPage)) {
                     Frontends.lists[olPage]?.$el?.remove()
                     Frontends.lists[olPage].clearData()
-                    pageFront.splice(index, 1)
+                    return false
                 }
+                return true
             })
 
             item.front.map((page, index) => {
