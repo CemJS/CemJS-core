@@ -71,17 +71,13 @@ class Frontends {
         return null
     }
 
-    eventSource(url, fn) {
+    eventSource(url) {
         if (this.Variable._Api) {
             url = this.Variable._Api + url
         }
-        let tmp = new EventSource(url)
-        tmp.addEventListener('open', (e) => { })
-        tmp.addEventListener('message', fn)
-        tmp.addEventListener('error', (error) => {
-            console.error("eventSource", error)
-        })
-        this._ListsEventSource.push(tmp)
+        let event = new EventSource(url)
+        this._ListsEventSource.push(event)
+        return event
     }
 
     clearData() {
