@@ -60,7 +60,8 @@ class Frontends {
 
     cross(data) {
         for (let item of Cross[this.name]) {
-            item.fn(data)
+            if (Frontends.lists[item.name]?.$el)
+                item.fn(data)
         }
     }
 
@@ -69,6 +70,7 @@ class Frontends {
             this._ListsOn[name] = callback
         } else if (name == "cross") {
             for (let item of callback) {
+                item.name = this.name
                 if (!Cross[item.front]) {
                     Cross[item.front] = [item]
                 } else {
