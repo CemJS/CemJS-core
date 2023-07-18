@@ -4,11 +4,12 @@ import * as Fn from './fn'
 const pageFront = { lists: [] }
 const Services = {}
 const Variable = {}
+const Cross = {}
 
 const sendOn = function (name, ...data) {
 
-    if (this._LostsOn[name]) {
-        this._LostsOn[name].bind(this)(...data)
+    if (this._ListsOn[name]) {
+        this._ListsOn[name].bind(this)(...data)
     }
 }
 
@@ -53,13 +54,27 @@ class Frontends {
         this.Ref = {}
         this._ListsEventListener = []
         this._ListsEventSource = []
-        this._LostsOn = {}
+        this._ListsOn = {}
         Frontends.lists[this.name] = this
+    }
+
+    cross(data) {
+        for (let item of Cross[this.name]) {
+            item.fn(data)
+        }
     }
 
     on(name, callback) {
         if (typeof callback == "function") {
-            this._LostsOn[name] = callback
+            this._ListsOn[name] = callback
+        } else if (name == "cross") {
+            for (let item of callback) {
+                if (!Cross[item.front]) {
+                    Cross[item.front] = [item]
+                } else {
+                    Cross[item.front].push(item)
+                }
+            }
         }
     }
 
@@ -161,4 +176,4 @@ class Frontends {
 
 }
 
-export { Frontends, pageFront, Services, Variable }
+export { Frontends, pageFront, Services, Variable, Cross }
