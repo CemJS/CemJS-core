@@ -48,6 +48,7 @@ class Frontends {
         this.loader = micro.loader
         this.display = micro.display
         this.Static = { name: this.name }
+        this._fn = micro.fn
         this.Fn = Fn
         this.Services = Services
         this.Variable = Variable
@@ -61,7 +62,13 @@ class Frontends {
     cross(data) {
         for (let item of Cross[this.name]) {
             if (Frontends.lists[item.name]?.$el)
-                item.fn(data)
+                item.fn.bind(Frontends.lists[item.name])(data)
+        }
+    }
+
+    fn(key, ...data) {
+        if (typeof this._fn[key] == "function") {
+            this._fn[key].bind(this)(...data)
         }
     }
 
@@ -89,6 +96,17 @@ class Frontends {
     }
 
     eventSource(url) {
+        if (this.Variable._Api) {
+            url = this.Variable._Api + url
+        }
+        let event = new EventSource(url)
+        this._ListsEventSource.push(event)
+        return event
+    }
+
+    eventSourceChange(url) {
+        this._ListsEventSource[0].close()
+        this._ListsEventSource = []
         if (this.Variable._Api) {
             url = this.Variable._Api + url
         }
