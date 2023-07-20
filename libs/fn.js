@@ -1,7 +1,8 @@
-import { Frontends} from './class'
+import { Frontends } from './class'
 
 export const link = function (e) {
-    let $el = e.currentTarget
+    console.log('=link=', e, e.currentTarget, e.target)
+    let $el = e.currentTarget || e.target
     if ($el.href) {
         if (!$el.href.includes(window.location.host)) {
             $el.target = "_blank"
@@ -13,17 +14,17 @@ export const link = function (e) {
     }
 }
 
-export const initOne = function({name,data,ifOpen}){
-    if (!Frontends.lists[name]){
-        console.error('=d792ce=',"No name =>",name)
+export const initOne = function ({ name, data, ifOpen }) {
+    if (!Frontends.lists[name]) {
+        console.error('=d792ce=', "No name =>", name)
         return
     }
 
-    if(Frontends.lists[name].$el){
-       if(ifOpen){
-        ifOpen(Frontends.lists[name])
-        return
-       }
+    if (Frontends.lists[name].$el) {
+        if (ifOpen) {
+            ifOpen(Frontends.lists[name])
+            return
+        }
     }
     Frontends.lists[name].init()
     return
