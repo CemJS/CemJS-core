@@ -67,6 +67,12 @@ const setDataElement = function (data, $el, Data) {
 }
 
 const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
+    if (!oldData) {
+        oldData = {}
+    }
+    if (!newData) {
+        newData = {}
+    }
     Object.keys(Object.assign({}, newData, oldData)).forEach(name => {
 
         if (name.startsWith('on') && name.toLowerCase() in window && name in oldData) {
