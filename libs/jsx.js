@@ -88,7 +88,15 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
 
         if (checkDifferent(newData[name], oldData[name])) {
             if (name in newData) {
+                if (!newData[name]) {
+                    $el?.removeAttribute(name);
+                    return
+                }
                 if (name == "ref") {
+                    return
+                }
+                if (name == "value") {
+                    $el.value = newData[name]
                     return
                 }
                 if (typeof newData[name] == "object") {
