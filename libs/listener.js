@@ -3,7 +3,14 @@ import { Frontends, pageFront } from './class'
 
 const changeUrl = async function (e) {
     for (let item of cemConfig.pages) {
-        if (item.url == window.location.pathname) {
+        let checkReg = false
+        if (item.regex) {
+            let regex = new RegExp(item.regex)
+            if (window.location.pathname.search(new RegExp(item.regex)) != -1) {
+                checkReg = true
+            }
+        }
+        if ((item.url && item.url == window.location.pathname) || checkReg) {
             pageFront.lists = pageFront.lists.filter((olPage, index) => {
                 if (!item.front.includes(olPage)) {
                     Frontends.lists[olPage]?.$el?.remove()
@@ -18,6 +25,10 @@ const changeUrl = async function (e) {
                     Frontends.lists[page].init(index)
                 }
             })
+            return
+
+        } else if (item.regex && item.regex == window.location.pathname) {
+
         }
     }
 }
