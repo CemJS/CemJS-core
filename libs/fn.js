@@ -26,6 +26,9 @@ export const initOne = function ({ name, data, ifOpen }) {
             return
         }
     }
+    if (typeof data == "object") {
+        Object.assign(Frontends.lists[name].Static, data)
+    }
     Frontends.lists[name].init()
     return
 
