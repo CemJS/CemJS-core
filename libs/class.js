@@ -1,14 +1,15 @@
 import { display } from './jsx'
 import * as Fn from './fn'
 
-const pageFront = []
+const pageFront = { lists: [] }
 const Services = {}
 const Variable = {}
+const Cross = {}
 
 const sendOn = function (name, ...data) {
 
-    if (this._LostsOn[name]) {
-        this._LostsOn[name].bind(this)(...data)
+    if (this._ListsOn[name]) {
+        this._ListsOn[name].bind(this)(...data)
     }
 }
 
@@ -47,19 +48,42 @@ class Frontends {
         this.loader = micro.loader
         this.display = micro.display
         this.Static = { name: this.name }
+        this._fn = micro.fn
         this.Fn = Fn
         this.Services = Services
         this.Variable = Variable
         this.Ref = {}
         this._ListsEventListener = []
         this._ListsEventSource = []
-        this._LostsOn = {}
+        this._ListsOn = {}
         Frontends.lists[this.name] = this
+    }
+
+    cross(data) {
+        for (let item of Cross[this.name]) {
+            if (Frontends.lists[item.name]?.$el)
+                item.fn.bind(Frontends.lists[item.name])(data)
+        }
+    }
+
+    fn(key, ...data) {
+        if (typeof this._fn[key] == "function") {
+            this._fn[key].bind(this)(...data)
+        }
     }
 
     on(name, callback) {
         if (typeof callback == "function") {
-            this._LostsOn[name] = callback
+            this._ListsOn[name] = callback
+        } else if (name == "cross") {
+            for (let item of callback) {
+                item.name = this.name
+                if (!Cross[item.front]) {
+                    Cross[item.front] = [item]
+                } else {
+                    Cross[item.front].push(item)
+                }
+            }
         }
     }
 
@@ -71,19 +95,28 @@ class Frontends {
         return null
     }
 
-    eventSource(url, fn) {
-        let tmp = new EventSource(url)
-        tmp.addEventListener('open', (e) => {
-            console.log("eventSource", e)
-        })
-        tmp.addEventListener('message', fn)
-        tmp.addEventListener('error', (error) => {
-            console.error("eventSource", error)
-        })
-        this._ListsEventSource.push(tmp)
+    eventSource(url) {
+        if (this.Variable._Api) {
+            url = this.Variable._Api + url
+        }
+        let event = new EventSource(url)
+        this._ListsEventSource.push(event)
+        return event
+    }
+
+    eventSourceChange(url) {
+        this._ListsEventSource[0].close()
+        this._ListsEventSource = []
+        if (this.Variable._Api) {
+            url = this.Variable._Api + url
+        }
+        let event = new EventSource(url)
+        this._ListsEventSource.push(event)
+        return event
     }
 
     clearData() {
+        this?.$el?.remove()
         delete this.$el
         delete this._VDomNew
         delete this._VDomActual
@@ -141,8 +174,8 @@ class Frontends {
     async init(index) {
         sendOn.bind(this)("start", "Start init!", this.name)
 
-        if (!pageFront.includes(this.name)) {
-            pageFront.push(this.name)
+        if (!pageFront.lists.includes(this.name)) {
+            pageFront.lists.push(this.name)
         }
         if (!this._VDomActual) {
             await this.loader()
@@ -163,4 +196,4 @@ class Frontends {
 
 }
 
-export { Frontends, pageFront, Services, Variable }
+export { Frontends, pageFront, Services, Variable, Cross }

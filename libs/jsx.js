@@ -33,9 +33,12 @@ const checkNodeTag = function (node, Data) {
 }
 
 const checkDifferent = function (data, data2) {
+
     if (data?.toString() == data2?.toString()) {
         return false
     }
+    // console.log('=483897=', data, data2)
+
     return true
 }
 
@@ -67,6 +70,12 @@ const setDataElement = function (data, $el, Data) {
 }
 
 const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
+    if (!oldData) {
+        oldData = {}
+    }
+    if (!newData) {
+        newData = {}
+    }
     Object.keys(Object.assign({}, newData, oldData)).forEach(name => {
 
         if (name.startsWith('on') && name.toLowerCase() in window && name in oldData) {
@@ -81,8 +90,25 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
         }
 
         if (checkDifferent(newData[name], oldData[name])) {
+
             if (name in newData) {
+                if (!newData[name]) {
+                    if (name == "value") {
+                        $el.value = ""
+                        return
+                    }
+                    $el?.removeAttribute(name);
+                    return
+                }
                 if (name == "ref") {
+                    if ($el !== Data.Ref[newData[name]]) {
+                        Data.Ref[newData[name]] = $el
+                    }
+                    return
+                }
+                if (name == "value") {
+
+                    $el.value = newData[name]
                     return
                 }
                 if (typeof newData[name] == "object") {
@@ -92,6 +118,11 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                 }
                 $el.setAttribute(name, newData[name])
             } else {
+                if (name == "value") {
+                    $el.value = ""
+                    return
+                }
+
                 $el?.removeAttribute(name);
             }
         }
