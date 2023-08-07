@@ -37,7 +37,6 @@ const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
         return false
     }
-    // console.log('=483897=', data, data2)
 
     return true
 }

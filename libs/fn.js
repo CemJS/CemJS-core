@@ -1,7 +1,6 @@
 import { Frontends } from './class'
 
 export const link = function (e) {
-    console.log('=link=', e, e.currentTarget, e.target)
     let $el = e.currentTarget || e.target
     if ($el.href) {
         if (!$el.href.includes(window.location.host)) {
