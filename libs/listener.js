@@ -3,6 +3,12 @@ import { Frontends, pageFront } from './class'
 
 
 const initFront = function (front) {
+    if (typeof front == "string") {
+        if (Frontends.lists[front]) {
+            Frontends.lists[front].init()
+        }
+        return
+    }
     front.map((page, index) => {
         if (Frontends.lists[page]) {
             Frontends.lists[page].init(index)
