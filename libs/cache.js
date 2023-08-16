@@ -40,15 +40,18 @@ export { cache, idb, idbGet, idbPut, idbAdd }
 
 
 export const openChache = async function () {
-    cache = await caches.open("v1")
-
-    DB = await openDB('Cache', 1, {
-        upgrade: async (db, oldVersion) => {
-            if (oldVersion == 0) {
-                const Fronts = db.createObjectStore('Fronts', { keyPath: 'name', });
-                const Services = db.createObjectStore('Services', { keyPath: 'name', });
-            }
-        },
-    });
+    try {
+        cache = await window.caches.open("v1")
+        DB = await openDB('Cache', 1, {
+            upgrade: async (db, oldVersion) => {
+                if (oldVersion == 0) {
+                    const Fronts = db.createObjectStore('Fronts', { keyPath: 'name', });
+                    const Services = db.createObjectStore('Services', { keyPath: 'name', });
+                }
+            },
+        });
+    } catch (error) {
+        console.error('=9b768e openChache=', error)
+    }
     return
 }

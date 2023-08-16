@@ -55,3 +55,12 @@ export const initOne = async function ({ name, data, ifOpen }) {
     return
 
 }
+
+
+export const initAll = async function () {
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            Frontends.lists[key].init()
+        }
+    }
+}
