@@ -1,5 +1,6 @@
 import { cemConfig, load } from './loader'
 import { Frontends, pageFront } from './class'
+import { Variable } from './class'
 
 const loadFront = async function (front, index) {
     if (cemConfig.microFrontends[front]) {
@@ -54,6 +55,8 @@ const clearFront = function (front) {
 }
 
 const changeUrl = async function (e) {
+    Variable.DataUrl = window.location.pathname.split("/")
+    Variable.DataUrl = Variable.DataUrl.filter(item => item != "")
     for (let item of cemConfig.pages) {
         if (item.all) {
             initFront(item.front)
