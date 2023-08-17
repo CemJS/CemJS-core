@@ -1,7 +1,28 @@
 import { Frontends } from './class'
+import { cemConfig, load } from './loader'
+
+
+const loadFront = async function (front, data) {
+    if (cemConfig.microFrontends[front]) {
+        if (cemConfig.microFrontends[front]?.path?.css) {
+            let head = document.getElementsByTagName('head')[0];
+            let link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = cemConfig.microFrontends[front]?.path?.css;
+            head.appendChild(link);
+        }
+
+        if (cemConfig.microFrontends[front]?.path?.js) {
+            let microFrontend = await import(cemConfig.microFrontends[front]?.path?.js)
+            microFrontend.micro.name = cemConfig.microFrontends[front].name
+            await load(microFrontend.micro, cemConfig.microFrontends[front].one)
+            initOne(data)
+        }
+    }
+}
 
 export const link = function (e) {
-    console.log('=link=', e, e.currentTarget, e.target)
     let $el = e.currentTarget || e.target
     if ($el.href) {
         if (!$el.href.includes(window.location.host)) {
@@ -14,8 +35,9 @@ export const link = function (e) {
     }
 }
 
-export const initOne = function ({ name, data, ifOpen }) {
+export const initOne = async function ({ name, data, ifOpen }) {
     if (!Frontends.lists[name]) {
+        await loadFront(name, { name, data, ifOpen })
         console.error('=d792ce=', "No name =>", name)
         return
     }
@@ -32,4 +54,13 @@ export const initOne = function ({ name, data, ifOpen }) {
     Frontends.lists[name].init()
     return
 
+}
+
+
+export const initAll = async function () {
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            Frontends.lists[key].init()
+        }
+    }
 }

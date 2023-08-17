@@ -37,7 +37,6 @@ const checkDifferent = function (data, data2) {
     if (data?.toString() == data2?.toString()) {
         return false
     }
-    // console.log('=483897=', data, data2)
 
     return true
 }
@@ -67,6 +66,13 @@ const setDataElement = function (data, $el, Data) {
         }
     })
     return
+}
+
+const setDataElementSvg = function (data, $el) {
+    Object.entries(data || {}).forEach(([name, value]) => {
+        $el.setAttributeNS(null, name, value);
+    })
+    return $el
 }
 
 const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
@@ -129,7 +135,7 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
     });
 }
 
-const createElement = function (node, Data) {
+const createElement = function (node, Data, typeSvg) {
     if (checkNofing(node)) {
         return null
     }
@@ -140,15 +146,28 @@ const createElement = function (node, Data) {
         let tempNode = checkNodeTag(node, Data)
         node = tempNode
     }
-    let $el = document.createElement(node.tag)
+
+    let $el
+    if (node.tag == "svg" || typeSvg) {
+        typeSvg = true
+        $el = document.createElementNS("http://www.w3.org/2000/svg", node.tag);
+    } else {
+        $el = document.createElement(node.tag)
+    }
     node.$el = $el
     if (node.data?.ref && Data.Ref) {
         Data.Ref[node.data?.ref] = $el
     }
-    setDataElement(node.data, $el, Data)
+    if (typeSvg) {
+        setDataElementSvg(node.data, $el)
+
+    } else {
+        setDataElement(node.data, $el, Data)
+
+    }
     if (typeof node.children == "object") {
         node.children
-            .map(item => createElement(item, Data))
+            .map(item => createElement(item, Data, typeSvg))
             .filter(item => !checkNofing(item))
             .forEach($el.appendChild.bind($el));
     } else {
