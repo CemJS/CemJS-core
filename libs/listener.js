@@ -68,6 +68,17 @@ const changeUrl = async function (e) {
     }
 }
 
+const clickAny = function (e) {
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            if (Frontends.lists[key]?._ListsOn?.clickAny) {
+                Frontends.lists[key]._ListsOn.clickAny.bind(Frontends.lists[key])(e)
+            }
+        }
+    }
+}
+
 export const listener = function () {
     window.addEventListener('popstate', changeUrl);
+    window.addEventListener('click', clickAny);
 }
