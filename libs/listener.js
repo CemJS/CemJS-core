@@ -78,7 +78,30 @@ const clickAny = function (e) {
     }
 }
 
+const keydownAny = function (e) {
+
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            if (Frontends.lists[key]?._ListsOn?.keydownAny) {
+                Frontends.lists[key]._ListsOn.keydownAny.bind(Frontends.lists[key])(e)
+            }
+        }
+    }
+}
+
+const keyupAny = function (e) {
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            if (Frontends.lists[key]?._ListsOn?.keyupAny) {
+                Frontends.lists[key]._ListsOn.keyupAny.bind(Frontends.lists[key])(e)
+            }
+        }
+    }
+}
+
 export const listener = function () {
     window.addEventListener('popstate', changeUrl);
     window.addEventListener('click', clickAny);
+    document.addEventListener('keydown', keydownAny);
+    document.addEventListener('keyup', keyupAny);
 }
