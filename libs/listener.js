@@ -66,6 +66,7 @@ const changeUrl = async function (e) {
             clearFront(item.front)
         }
     }
+    document.documentElement.scrollIntoView(true)
 }
 
 const clickAny = function (e) {
