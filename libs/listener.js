@@ -1,5 +1,6 @@
 import { cemConfig, load } from './loader'
 import { Frontends, pageFront } from './class'
+import { Variable } from './class'
 
 const loadFront = async function (front, index) {
     if (cemConfig.microFrontends[front]) {
@@ -54,6 +55,8 @@ const clearFront = function (front) {
 }
 
 const changeUrl = async function (e) {
+    Variable.DataUrl = window.location.pathname.split("/")
+    Variable.DataUrl = Variable.DataUrl.filter(item => item != "")
     for (let item of cemConfig.pages) {
         if (item.all) {
             initFront(item.front)
@@ -63,8 +66,43 @@ const changeUrl = async function (e) {
             clearFront(item.front)
         }
     }
+    document.documentElement.scrollIntoView(true)
+}
+
+const clickAny = function (e) {
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            if (Frontends.lists[key]?._ListsOn?.clickAny) {
+                Frontends.lists[key]._ListsOn.clickAny.bind(Frontends.lists[key])(e)
+            }
+        }
+    }
+}
+
+const keydownAny = function (e) {
+
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            if (Frontends.lists[key]?._ListsOn?.keydownAny) {
+                Frontends.lists[key]._ListsOn.keydownAny.bind(Frontends.lists[key])(e)
+            }
+        }
+    }
+}
+
+const keyupAny = function (e) {
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el) {
+            if (Frontends.lists[key]?._ListsOn?.keyupAny) {
+                Frontends.lists[key]._ListsOn.keyupAny.bind(Frontends.lists[key])(e)
+            }
+        }
+    }
 }
 
 export const listener = function () {
     window.addEventListener('popstate', changeUrl);
+    window.addEventListener('click', clickAny);
+    document.addEventListener('keydown', keydownAny);
+    document.addEventListener('keyup', keyupAny);
 }
