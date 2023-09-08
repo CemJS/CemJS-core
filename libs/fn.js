@@ -35,6 +35,11 @@ export const link = function (e) {
     }
 }
 
+export const linkChange = function (link) {
+    history.pushState({}, '', link);
+    window.dispatchEvent(new Event('popstate'));
+}
+
 export const initOne = async function ({ name, data, ifOpen }) {
     if (!Frontends.lists[name]) {
         await loadFront(name, { name, data, ifOpen })
