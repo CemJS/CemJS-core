@@ -1,7 +1,7 @@
 import { Frontends } from './class'
-import { cemConfig, load } from './loader'
+import { cemConfigs, load } from './loader'
 
-
+let cemConfig = cemConfigs
 const loadFront = async function (front, data) {
     if (cemConfig.microFrontends[front]) {
         if (cemConfig.microFrontends[front]?.path?.css) {
