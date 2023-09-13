@@ -26,7 +26,7 @@ const VDomStartFn = function (_VDomNew, Data) {
     }
     let tmp = { tag: _VDomNew.tag, data: _VDomNew.data, children: _VDomNew.children }
     if (typeof tmp.tag == "function") {
-        let tmpp = VDomStartFn(tmp.tag.bind(Data)(), Data)
+        let tmpp = VDomStartFn(tmp.tag.bind(Data)(tmp.data), Data)
         return tmpp
     }
     if (tmp.children) {
@@ -43,12 +43,13 @@ class Frontends {
 
     static lists = {}
 
-    constructor(micro) {
-        this.name = micro.name
-        this.loader = micro.loader
-        this.display = micro.display
+    constructor(front) {
+        this.name = front.name
+        this.loader = front.loader
+        this.display = front.display
         this.Static = { name: this.name }
-        this._fn = micro.fn
+        this.func = front.func
+        this._fn = front.fn || front.func
         this.Fn = Fn
         this.Services = Services
         this.Variable = Variable
@@ -181,6 +182,7 @@ class Frontends {
             await this.loader()
         }
         this._VDomNew = VDomStartFn(await this.display(), this)
+
         this.$el = display(this._VDomNew, this._VDomActual, this.$el, this, index)
         this._VDomActual = this._VDomNew
         this._ListsEventListener = this._ListsEventListener.filter((item) => {

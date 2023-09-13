@@ -52,8 +52,9 @@ const setDataElement = function (data, $el, Data) {
     if (!data) { return }
     Object.entries(data).forEach(([name, value]) => {
         if (name.startsWith('on') && name.toLowerCase() in window) {
-            $el.addEventListener(name.toLowerCase().substring(2), value)
-            Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: value })
+            let tmpFn = value.bind(Data)
+            $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
+            Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
         } else if (name == "ref") {
             return
         } else {
@@ -90,8 +91,10 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
 
 
         if (name.startsWith('on') && name.toLowerCase() in window && name in newData) {
-            $el.addEventListener(name.toLowerCase().substring(2), newData[name])
-            Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: newData[name] })
+            let tmpFn = newData[name].bind(Data)
+
+            $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
+            Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
             return
         }
 

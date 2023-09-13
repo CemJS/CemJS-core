@@ -1,6 +1,6 @@
 import { Frontends, Services, Variable } from './class'
 import { listener } from './listener'
-import { openChache, cache, idbGet, idbPut, idbAdd, getFiles } from './cache'
+import { getFiles } from './cache'
 
 let cemConfigs = {}
 
@@ -67,12 +67,25 @@ const initProject = async function (configs) {
     for (let item of configs.frontends) {
         nowCheck++
         if (item.path?.js) {
-            // let response = await getFiles(item.path?.js, configs.cemjs.live)
+            let response = await getFiles(item.path?.js, configs.cemjs.live)
+            var objectURL = URL.createObjectURL(await response.blob());
+            let { frontend } = await import(objectURL)
+            if (frontend) {
+                frontend.name = item.name
+                await load(frontend)
+            }
         }
 
         if (item.path?.css) {
             nowCheck++
-            // let response = await getFiles(item.path?.css, configs.cemjs.live)
+            let response = await getFiles(item.path?.css, configs.cemjs.live)
+            var objectURL = URL.createObjectURL(await response.blob());
+            let head = document.getElementsByTagName('head')[0];
+            let link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = objectURL;
+            head.appendChild(link);
         }
         if (typeof Services["preloader"]?.progress == "function") {
             Services["preloader"].progress({ total: files.length, load: nowCheck })
