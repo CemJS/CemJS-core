@@ -1,7 +1,7 @@
 import { Frontends } from './class'
-import { cemConfig, load } from './loader'
+import { cemConfigs, load } from './loader'
 
-
+let cemConfig = cemConfigs
 const loadFront = async function (front, data) {
     if (cemConfig.microFrontends[front]) {
         if (cemConfig.microFrontends[front]?.path?.css) {
@@ -33,6 +33,11 @@ export const link = function (e) {
         window.dispatchEvent(new Event('popstate'));
         e.preventDefault();
     }
+}
+
+export const linkChange = function (link) {
+    history.pushState({}, '', link);
+    window.dispatchEvent(new Event('popstate'));
 }
 
 export const initOne = async function ({ name, data, ifOpen }) {

@@ -1,71 +1,85 @@
 import { Frontends, Services, Variable } from './class'
 import { listener } from './listener'
-import { openChache, cache, idbGet, idbPut, idbAdd } from './cache'
+import { openChache, cache, idbGet, idbPut, idbAdd, getFiles } from './cache'
 
-let cemConfig
-const load = async function (micro, one) {
-    const frontend = new Frontends(micro)
-    if (micro.listener) {
-        for (let key in micro.listener) {
-            frontend.on(key, micro.listener[key])
+let cemConfigs = {}
+
+const load = async function (front) {
+    const frontend = new Frontends(front)
+    if (front.listener) {
+        for (let key in front.listener) {
+            frontend.on(key, front.listener[key])
         }
-    }
-    if (one) {
-        if (one === true) {
-            new EventSource('/esbuild').addEventListener('change', () => location.reload())
-        }
-        frontend.init()
     }
     return
 }
 
-const initMap = async function (config) {
-    new EventSource('/esbuild').addEventListener('change', () => location.reload())
-    await openChache()
-    listener()
-    cemConfig = config
-    if (cemConfig?.api) {
-        Variable._Api = cemConfig.api
+
+const initProject = async function (configs) {
+    if (!configs.cemjs || !configs.pages || !configs.frontends || !configs.services) {
+        console.error("Incorrect configurations")
+        return
     }
 
-    let i = 0
-    let totalMicro = Object.keys(config.services).length
-    totalMicro += Object.keys(config.microFrontends).length
+    cemConfigs = configs
+    listener()
 
-    for (let key in config.services) {
-        i++
-        if (config.services[key]?.path?.js) {
-            Services[key] = await import(`${config.services[key]?.path?.js}?ver=${config.services[key].ver}`)
-            if (typeof Services[key].loader == "function") {
-                await Services[key].loader(Variable)
+    if (configs.cemjs.live) {
+        new EventSource('/esbuild').addEventListener('change', () => location.reload())
+    }
+
+    if (configs.cemjs.eventApi) {
+        Variable._EventApi = configs.cemjs.eventApi
+    }
+
+    if (configs.cemjs.api) {
+        Variable._Api = configs.cemjs.api
+    }
+
+    let files = []
+    configs.services.map(item => {
+        files.push(item.path.js)
+    })
+    configs.frontends.map(item => {
+        files.push(item.path.js)
+        if (item.path.css) {
+            files.push(item.path.css)
+        }
+    })
+
+    let nowCheck = 0
+
+    for (let item of configs.services) {
+        nowCheck++
+        if (item.path?.js) {
+            let response = await getFiles(item.path?.js, configs.cemjs.live)
+            var objectURL = URL.createObjectURL(await response.blob());
+            Services[item.name] = await import(objectURL)
+            if (typeof Services[item.name].loader == "function") {
+                await Services[item.name].loader(Variable)
             }
         }
         if (typeof Services["preloader"]?.progress == "function") {
-            Services["preloader"]?.progress({ total: totalMicro, load: i })
+            Services["preloader"].progress({ total: files.length, load: nowCheck })
         }
     }
 
-    for (let key in config.microFrontends) {
-        i++
-        if (config.microFrontends[key]?.path?.css) {
-            let head = document.getElementsByTagName('head')[0];
-            let link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.href = `${config.microFrontends[key]?.path?.css}?ver=${config.microFrontends[key].ver}`;
-            head.appendChild(link);
+    for (let item of configs.frontends) {
+        nowCheck++
+        if (item.path?.js) {
+            // let response = await getFiles(item.path?.js, configs.cemjs.live)
         }
-        if (config.microFrontends[key]?.path?.js) {
-            let microFrontend = await import(`${config.microFrontends[key]?.path?.js}?ver=${config.microFrontends[key].ver}`)
-            microFrontend.micro.name = config.microFrontends[key].name
-            await load(microFrontend.micro, config.microFrontends[key].one)
+
+        if (item.path?.css) {
+            nowCheck++
+            // let response = await getFiles(item.path?.css, configs.cemjs.live)
         }
         if (typeof Services["preloader"]?.progress == "function") {
-            Services["preloader"]?.progress({ total: totalMicro, load: i })
+            Services["preloader"].progress({ total: files.length, load: nowCheck })
         }
     }
     history.pushState({}, '', window.location.pathname);
     window.dispatchEvent(new Event('popstate'));
 }
 
-export { load, initMap, cemConfig }
+export { initProject, load, cemConfigs }
