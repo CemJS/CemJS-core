@@ -56,6 +56,7 @@ class Frontends {
         this.Ref = {}
         this._ListsEventListener = []
         this._ListsEventSource = []
+        this._ListsInit = []
         this._ListsOn = {}
         Frontends.lists[this.name] = this
     }
@@ -185,6 +186,13 @@ class Frontends {
 
         this.$el = display(this._VDomNew, this._VDomActual, this.$el, this, index)
         this._VDomActual = this._VDomNew
+        if (this._ListsInit.length) {
+            for (let item of this._ListsInit) {
+                item.fn.bind(this)(item.$el)
+            }
+            this._ListsInit = []
+        }
+
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
             if (!document.body.contains(item.$el)) {
                 item.$el.removeEventListener(item.name, item.fn)
