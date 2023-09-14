@@ -75,6 +75,14 @@ const changeUrl = async function (e) {
             clearFront(item.front)
         }
     }
+    if (!pageFront.lists.length) {
+        let find = cemConfigs.pages.findIndex(function (item) {
+            return item.url == "/error";
+        });
+        if (find > -1) {
+            clearFront(cemConfigs.pages[find].front)
+        }
+    }
     document.documentElement.scrollIntoView(true)
 }
 
