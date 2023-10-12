@@ -37,7 +37,27 @@ const VDomStartFn = function (_VDomNew, Data) {
     return tmp
 }
 
+class Events {
+    constructor(url) {
+        this.url = url
+        this.event = new EventSource(url)
+    }
 
+    addEventListener(type, fn) {
+        this.event.addEventListener(type, fn)
+    }
+
+    close() {
+        this.event.close()
+    }
+
+    change(url) {
+        this.event.close()
+        this.url = url
+        this.event = new EventSource(url)
+    }
+
+}
 
 class Frontends {
 
@@ -69,8 +89,8 @@ class Frontends {
     }
 
     fn(key, ...data) {
-        if (typeof this._fn[key] == "function") {
-            this._fn[key].bind(this)(...data)
+        if (typeof this.func[key] == "function") {
+            this.func[key].bind(this)(...data)
         }
     }
 
@@ -97,11 +117,16 @@ class Frontends {
         return null
     }
 
+    event(url) {
+        let event = new Events(url)
+        this._ListsEventSource.push(event)
+    }
+
     eventSource(url) {
         if (this.Variable._Api) {
             url = this.Variable._Api + url
         }
-        let event = new EventSource(url)
+        let event = new Events(url)
         this._ListsEventSource.push(event)
         return event
     }
@@ -112,7 +137,7 @@ class Frontends {
         if (this.Variable._Api) {
             url = this.Variable._Api + url
         }
-        let event = new EventSource(url)
+        let event = new Events(url)
         this._ListsEventSource.push(event)
         return event
     }
@@ -132,6 +157,7 @@ class Frontends {
             item.close()
             return false
         })
+        this.Variable.$el.body.style.overflow = '';
     }
 
     initAuto(keys, fn) {
