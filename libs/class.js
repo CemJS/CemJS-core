@@ -68,6 +68,7 @@ class Frontends {
         this.loader = front.loader
         this.display = front.display
         this.Static = { name: this.name }
+        this.Events = {}
         this.func = front.func
         this._fn = front.fn || front.func
         this.Fn = Fn
@@ -120,6 +121,7 @@ class Frontends {
     event(url) {
         let event = new Events(url)
         this._ListsEventSource.push(event)
+        return event
     }
 
     eventSource(url) {
@@ -157,6 +159,7 @@ class Frontends {
             item.close()
             return false
         })
+        this.Events = {}
         this.Variable.$el.body.style.overflow = '';
     }
 
