@@ -38,12 +38,15 @@ const VDomStartFn = function (_VDomNew, Data) {
 }
 
 class Events {
+
     constructor(url) {
         this.url = url
+        this._Listener = []
         this.event = new EventSource(url)
     }
 
     addEventListener(type, fn) {
+        this._Listener.push({ type, fn })
         this.event.addEventListener(type, fn)
     }
 
@@ -55,6 +58,9 @@ class Events {
         this.event.close()
         this.url = url
         this.event = new EventSource(url)
+        for (let item of this._Listener) {
+            this.event.addEventListener(item.type, item.fn)
+        }
     }
 
 }
@@ -160,7 +166,7 @@ class Frontends {
             return false
         })
         this.Events = {}
-        this.Variable.$el.body.style.overflow = '';
+        // this.Variable.$el.body.style.overflow = 'auto';
     }
 
     initAuto(keys, fn) {
