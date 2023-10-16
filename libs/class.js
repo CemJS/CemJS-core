@@ -37,7 +37,39 @@ const VDomStartFn = function (_VDomNew, Data) {
     return tmp
 }
 
+class Events {
 
+    constructor(url, Listener) {
+        this.url = url
+        this._Listener = Listener
+        this.event = new EventSource(url)
+        for (let item of this._Listener) {
+            this.event.addEventListener(item.type, item.fn.bind(this))
+        }
+    }
+
+    addEventListener(type, fn) {
+        this._Listener.push({ type, fn })
+        this.event.addEventListener(type, fn.bind(this))
+    }
+
+    close() {
+        this.event.close()
+    }
+
+    change(url, Listener) {
+        this.event.close()
+        this.url = url
+        this.event = new EventSource(url)
+        if (Listener.length) {
+            this._Listener = Listener
+        }
+        for (let item of this._Listener) {
+            this.event.addEventListener(item.type, item.fn)
+        }
+    }
+
+}
 
 class Frontends {
 
@@ -48,6 +80,7 @@ class Frontends {
         this.loader = front.loader
         this.display = front.display
         this.Static = { name: this.name }
+        this.Events = {}
         this.func = front.func
         this._fn = front.fn || front.func
         this.Fn = Fn
@@ -69,8 +102,8 @@ class Frontends {
     }
 
     fn(key, ...data) {
-        if (typeof this._fn[key] == "function") {
-            this._fn[key].bind(this)(...data)
+        if (typeof this.func[key] == "function") {
+            this.func[key].bind(this)(...data)
         }
     }
 
@@ -97,11 +130,17 @@ class Frontends {
         return null
     }
 
+    event(url, Listener) {
+        let event = new Events(url, Listener)
+        this._ListsEventSource.push(event)
+        return event
+    }
+
     eventSource(url) {
         if (this.Variable._Api) {
             url = this.Variable._Api + url
         }
-        let event = new EventSource(url)
+        let event = new Events(url)
         this._ListsEventSource.push(event)
         return event
     }
@@ -112,7 +151,7 @@ class Frontends {
         if (this.Variable._Api) {
             url = this.Variable._Api + url
         }
-        let event = new EventSource(url)
+        let event = new Events(url)
         this._ListsEventSource.push(event)
         return event
     }
@@ -132,6 +171,8 @@ class Frontends {
             item.close()
             return false
         })
+        this.Events = {}
+        // this.Variable.$el.body.style.overflow = 'auto';
     }
 
     initAuto(keys, fn) {
