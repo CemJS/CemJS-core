@@ -39,7 +39,7 @@ const VDomStartFn = function (_VDomNew, Data) {
 
 class Events {
 
-    constructor(url, Listener) {
+    constructor(url, Listener = []) {
         this.url = url
         this._Listener = Listener
         this.event = new EventSource(url)
@@ -57,7 +57,7 @@ class Events {
         this.event.close()
     }
 
-    change(url, Listener) {
+    change(url, Listener = []) {
         this.event.close()
         this.url = url
         this.event = new EventSource(url)
