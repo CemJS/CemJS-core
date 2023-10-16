@@ -161,6 +161,15 @@ class Frontends {
         delete this.$el
         delete this._VDomNew
         delete this._VDomActual
+
+        if (this.Static.setInterval) {
+            clearInterval(this.Static.setInterval)
+        }
+
+        if (this.Static.setTimeout) {
+            clearTimeout(this.Static.setTimeout)
+        }
+
         this.Static = { name: this.name }
         this.Ref = {}
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
@@ -171,6 +180,7 @@ class Frontends {
             item.close()
             return false
         })
+
         this.Events = {}
         // this.Variable.$el.body.style.overflow = 'auto';
     }
