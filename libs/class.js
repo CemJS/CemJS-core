@@ -39,25 +39,31 @@ const VDomStartFn = function (_VDomNew, Data) {
 
 class Events {
 
-    constructor(url) {
+    constructor(url, Listener) {
         this.url = url
-        this._Listener = []
+        this._Listener = Listener
         this.event = new EventSource(url)
+        for (let item of this._Listener) {
+            this.event.addEventListener(item.type, item.fn.bind(this))
+        }
     }
 
     addEventListener(type, fn) {
         this._Listener.push({ type, fn })
-        this.event.addEventListener(type, fn)
+        this.event.addEventListener(type, fn.bind(this))
     }
 
     close() {
         this.event.close()
     }
 
-    change(url) {
+    change(url, Listener) {
         this.event.close()
         this.url = url
         this.event = new EventSource(url)
+        if (Listener.length) {
+            this._Listener = Listener
+        }
         for (let item of this._Listener) {
             this.event.addEventListener(item.type, item.fn)
         }
@@ -124,8 +130,8 @@ class Frontends {
         return null
     }
 
-    event(url) {
-        let event = new Events(url)
+    event(url, Listener) {
+        let event = new Events(url, Listener)
         this._ListsEventSource.push(event)
         return event
     }
