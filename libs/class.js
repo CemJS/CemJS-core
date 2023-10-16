@@ -179,7 +179,7 @@ class Frontends {
         const init = this.init.bind(this)
         if (Array.isArray(keys)) {
             for (let item of keys) {
-                if (this.Static[item]) {
+                if (typeof this.Static[item] != "undefined") {
                     this.Static[`_${item}`] = this.Static[item]
                 }
                 this.Static.__defineGetter__(item, function () {
@@ -196,7 +196,7 @@ class Frontends {
                 });
             }
         } else {
-            if (this.Static[keys]) {
+            if (typeof this.Static[keys] != "undefined") {
                 this.Static[`_${keys}`] = this.Static[keys]
             }
             this.Static.__defineGetter__(keys, function () {
