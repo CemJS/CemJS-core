@@ -104,8 +104,9 @@ class Frontends {
 
     fn(key, ...data) {
         if (typeof this.func[key] == "function") {
-            this.func[key].bind(this)(...data)
+            return this.func[key].bind(this)(...data)
         }
+        return null
     }
 
     on(name, callback) {
