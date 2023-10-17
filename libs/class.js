@@ -90,6 +90,7 @@ class Frontends {
         this._ListsEventListener = []
         this._ListsEventSource = []
         this._ListsInit = []
+        this._ListsVisible = []
         this._ListsOn = {}
         Frontends.lists[this.name] = this
     }
@@ -182,6 +183,7 @@ class Frontends {
         })
 
         this.Events = {}
+        this._ListsVisible = []
         // this.Variable.$el.body.style.overflow = 'auto';
     }
 

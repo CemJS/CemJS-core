@@ -55,7 +55,7 @@ const setDataElement = function (data, $el, Data) {
             let tmpFn = value.bind(Data)
             $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
             Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
-        } else if (name == "ref" || name == "init") {
+        } else if (name == "ref" || name == "init" || name == "isVisible") {
             return
         } else {
             if (typeof value == "object") {
@@ -118,6 +118,9 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                 if (name == "init") {
                     return
                 }
+                if (name == "isVisible") {
+                    return
+                }
                 if (name == "value") {
 
                     $el.value = newData[name]
@@ -166,6 +169,9 @@ const createElement = function (node, Data, typeSvg) {
     }
     if (node.data?.init) {
         Data._ListsInit.push({ $el: $el, fn: node.data?.init })
+    }
+    if (node.data?.isVisible && typeof node.data?.isVisible == "function") {
+        Data._ListsVisible.push({ $el: $el, fn: node.data?.isVisible })
     }
     if (typeSvg) {
         setDataElementSvg(node.data, $el)
