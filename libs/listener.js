@@ -120,8 +120,8 @@ const scroll = function (e) {
 
     for (let key in Frontends.lists) {
         if (Frontends.lists[key].$el) {
-            if (Frontends.lists[key]?._ListsOn?.clickAny) {
-                Frontends.lists[key]._ListsOn.clickAny.bind(Frontends.lists[key])(e)
+            if (Frontends.lists[key]?._ListsOn?.scroll) {
+                Frontends.lists[key]._ListsOn.scroll.bind(Frontends.lists[key])(e)
             }
         }
     }
