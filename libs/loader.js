@@ -56,7 +56,7 @@ const initProject = async function (configs) {
             var objectURL = URL.createObjectURL(await response.blob());
             Services[item.name] = await import(objectURL)
             if (typeof Services[item.name].loader == "function") {
-                await Services[item.name].loader(Variable)
+                await Services[item.name].loader(Variable, Frontends, Services)
             }
         }
         if (typeof Services["preloader"]?.progress == "function") {
