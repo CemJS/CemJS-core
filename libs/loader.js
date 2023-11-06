@@ -1,6 +1,7 @@
 import { Frontends, Services, Variable } from './class'
 import { listener } from './listener'
 import { getFiles } from './cache'
+import * as Fn from './fn'
 
 let cemConfigs = {}
 
@@ -56,7 +57,7 @@ const initProject = async function (configs) {
             var objectURL = URL.createObjectURL(await response.blob());
             Services[item.name] = await import(objectURL)
             if (typeof Services[item.name].loader == "function") {
-                await Services[item.name].loader(Variable, Frontends, Services)
+                await Services[item.name].loader(Variable, Fn, Services, Frontends)
             }
         }
         if (typeof Services["preloader"]?.progress == "function") {
