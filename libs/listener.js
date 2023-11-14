@@ -116,8 +116,49 @@ const keyupAny = function (e) {
     }
 }
 
+const scroll = function (e) {
+
+    // for (let key in Frontends.lists) {
+    //     if (Frontends.lists[key].$el) {
+    //         if (Frontends.lists[key]?._ListsOn?.scroll) {
+    //             Frontends.lists[key]._ListsOn.scroll.bind(Frontends.lists[key])(e)
+    //         }
+    //     }
+    // }
+
+    let windowPosition = {
+        top: window.scrollY,
+        left: window.scrollX,
+        right: window.scrollX + document.documentElement.clientWidth,
+        bottom: window.scrollY + document.documentElement.clientHeight
+    };
+
+    for (let key in Frontends.lists) {
+        if (Frontends.lists[key].$el && Frontends.lists[key]._ListsVisible.length) {
+            Frontends.lists[key]._ListsVisible = Frontends.lists[key]._ListsVisible.filter((item, index) => {
+                let targetPosition = {
+                    top: window.scrollY + item.$el.getBoundingClientRect().top,
+                    left: window.scrollX + item.$el.getBoundingClientRect().left,
+                    right: window.scrollX + item.$el.getBoundingClientRect().right,
+                    bottom: window.scrollY + item.$el.getBoundingClientRect().bottom
+                }
+                if (targetPosition.bottom > windowPosition.top &&
+                    targetPosition.top < windowPosition.bottom &&
+                    targetPosition.right > windowPosition.left &&
+                    targetPosition.left < windowPosition.right) {
+                    item.fn.bind(Frontends.lists[key])(item.$el);
+                    return false
+                } else {
+                    return true
+                }
+            })
+        }
+    }
+}
+
 export const listener = function () {
     window.addEventListener('popstate', changeUrl);
+    window.addEventListener('scroll', scroll);
     window.addEventListener('click', clickAny);
     document.addEventListener('keydown', keydownAny);
     document.addEventListener('keyup', keyupAny);

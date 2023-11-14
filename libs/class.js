@@ -39,7 +39,7 @@ const VDomStartFn = function (_VDomNew, Data) {
 
 class Events {
 
-    constructor(url, Listener) {
+    constructor(url, Listener = []) {
         this.url = url
         this._Listener = Listener
         this.event = new EventSource(url)
@@ -57,7 +57,7 @@ class Events {
         this.event.close()
     }
 
-    change(url, Listener) {
+    change(url, Listener = []) {
         this.event.close()
         this.url = url
         this.event = new EventSource(url)
@@ -90,6 +90,7 @@ class Frontends {
         this._ListsEventListener = []
         this._ListsEventSource = []
         this._ListsInit = []
+        this._ListsVisible = []
         this._ListsOn = {}
         Frontends.lists[this.name] = this
     }
@@ -103,8 +104,9 @@ class Frontends {
 
     fn(key, ...data) {
         if (typeof this.func[key] == "function") {
-            this.func[key].bind(this)(...data)
+            return this.func[key].bind(this)(...data)
         }
+        return null
     }
 
     on(name, callback) {
@@ -161,6 +163,15 @@ class Frontends {
         delete this.$el
         delete this._VDomNew
         delete this._VDomActual
+
+        if (this.Static.setInterval) {
+            clearInterval(this.Static.setInterval)
+        }
+
+        if (this.Static.setTimeout) {
+            clearTimeout(this.Static.setTimeout)
+        }
+
         this.Static = { name: this.name }
         this.Ref = {}
         this._ListsEventListener = this._ListsEventListener.filter((item) => {
@@ -171,7 +182,9 @@ class Frontends {
             item.close()
             return false
         })
+
         this.Events = {}
+        this._ListsVisible = []
         // this.Variable.$el.body.style.overflow = 'auto';
     }
 
@@ -179,7 +192,7 @@ class Frontends {
         const init = this.init.bind(this)
         if (Array.isArray(keys)) {
             for (let item of keys) {
-                if (this.Static[item]) {
+                if (typeof this.Static[item] != "undefined") {
                     this.Static[`_${item}`] = this.Static[item]
                 }
                 this.Static.__defineGetter__(item, function () {
@@ -196,7 +209,7 @@ class Frontends {
                 });
             }
         } else {
-            if (this.Static[keys]) {
+            if (typeof this.Static[keys] != "undefined") {
                 this.Static[`_${keys}`] = this.Static[keys]
             }
             this.Static.__defineGetter__(keys, function () {
