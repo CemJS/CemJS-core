@@ -38,6 +38,10 @@ Fn.init = async function (index) {
     return await front.Fn.init.bind(front)(index)
 }
 
+Fn.initOne = async function (name, data, ifOpen = null) {
+    return await front.Fn.initOne.bind(front)(name, data, ifOpen)
+}
+
 Fn.initAll = async function () {
     return await front.Fn.initAll.bind(front)()
 }

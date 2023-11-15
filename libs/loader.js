@@ -43,7 +43,7 @@ const loadFiles = async function (name, path, type) {
     if (type == "service") {
         variable.Services[name] = await import(objectURL)
         if (typeof variable.Services[name].loader == "function") {
-            await variable.Services[name].loader(variable.Variable)
+            await variable.Services[name].loader(variable.Variable, Fn)
         }
         return
     }

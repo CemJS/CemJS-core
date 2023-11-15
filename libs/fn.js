@@ -34,26 +34,6 @@ const VDomStartFn = function (_VDomNew, Data) {
     return tmp
 }
 
-const loadFront = async function (front, data) {
-    if (variable.cemConfigs.microFrontends[front]) {
-        if (variable.cemConfigs.microFrontends[front]?.path?.css) {
-            let head = document.getElementsByTagName('head')[0];
-            let link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.href = variable.cemConfigs.microFrontends[front]?.path?.css;
-            head.appendChild(link);
-        }
-
-        if (variable.cemConfigs.microFrontends[front]?.path?.js) {
-            let microFrontend = await import(variable.cemConfigs.microFrontends[front]?.path?.js)
-            microFrontend.micro.name = variable.cemConfigs.microFrontends[front].name
-            await load(microFrontend.micro, variable.cemConfigs.microFrontends[front].one)
-            initOne(data)
-        }
-    }
-}
-
 export const link = function (e) {
     let $el = e.currentTarget || e.target
     if ($el.href) {
@@ -72,9 +52,8 @@ export const linkChange = function (link) {
     window.dispatchEvent(new Event('popstate'));
 }
 
-export const initOne = async function ({ name, data, ifOpen }) {
+export const initOne = async function (name, data, ifOpen = null) {
     if (!variable.frontList[name]) {
-        await loadFront(name, { name, data, ifOpen })
         console.error('=d792ce=', "No name =>", name)
         return
     }
@@ -85,6 +64,7 @@ export const initOne = async function ({ name, data, ifOpen }) {
             return
         }
     }
+
     if (typeof data == "object") {
         Object.assign(variable.frontList[name].Static, data)
     }
