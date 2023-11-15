@@ -1,46 +1,81 @@
-import { Frontends, Services, Variable } from './class'
+
+import { variable } from './variable'
 import { listener } from './listener'
 import { getFiles } from './cache'
 import * as Fn from './fn'
 
-let cemConfigs = {}
 
 const load = async function (front) {
-    const frontend = new Frontends(front)
-    if (front.listener) {
-        for (let key in front.listener) {
-            frontend.on(key, front.listener[key])
-        }
-    }
+    front.Fn = Fn
+    front.Variable = variable.Variable
+    front.Services = variable.Services
+
+    // front._ListsEventListener = []
+    // front._ListsEventSource = []
+    // front._ListsInit = []
+    // front._ListsVisible = []
+    // front._ListsOn = {}
+
+    variable.frontList[front.name] = front
     return
 }
 
+const loadFiles = async function (name, path, type) {
+    if (!path) {
+        return
+    }
+
+    let response = await getFiles(path);
+    var objectURL = URL.createObjectURL(await response.blob());
+
+    if (type == "front") {
+        let { front } = await import(objectURL)
+        if (front) {
+            front.name = name
+            await load(front)
+        }
+        return
+    }
+
+    if (type == "style") {
+        let head = document.getElementsByTagName('head')[0];
+        let link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = objectURL;
+        head.appendChild(link);
+        return
+    }
+
+    if (type == "service") {
+        variable.Services[name] = await import(objectURL)
+        if (typeof variable.Services[name].loader == "function") {
+            await variable.Services[name].loader(variable.Variable)
+        }
+        return
+    }
+
+}
 
 const initProject = async function (configs) {
     if (!configs.cemjs || !configs.pages || !configs.frontends || !configs.services) {
         console.error("Incorrect configurations")
         return
     }
-
-    cemConfigs = configs
+    variable.cemConfigs = configs
     listener()
 
     if (configs.cemjs.live) {
         new EventSource('/esbuild').addEventListener('change', () => location.reload())
     }
 
-    if (configs.cemjs.eventApi) {
-        Variable._EventApi = configs.cemjs.eventApi
-    }
-
-    if (configs.cemjs.api) {
-        Variable._Api = configs.cemjs.api
-    }
-
     let files = []
+    let nowCheck = 0
+
     configs.services.map(item => {
         files.push(item.path.js)
     })
+
     configs.frontends.map(item => {
         files.push(item.path.js)
         if (item.path.css) {
@@ -48,52 +83,28 @@ const initProject = async function (configs) {
         }
     })
 
-    let nowCheck = 0
-
     for (let item of configs.services) {
         nowCheck++
-        if (item.path?.js) {
-            let response = await getFiles(item.path?.js, configs.cemjs.live)
-            var objectURL = URL.createObjectURL(await response.blob());
-            Services[item.name] = await import(objectURL)
-            if (typeof Services[item.name].loader == "function") {
-                await Services[item.name].loader(Variable, Fn, Services, Frontends)
-            }
-        }
-        if (typeof Services["preloader"]?.progress == "function") {
-            Services["preloader"].progress({ total: files.length, load: nowCheck })
+        await loadFiles(item.name, item.path?.js, "service")
+        if (typeof variable.Services["preloader"]?.progress == "function") {
+            variable.Services["preloader"].progress({ total: files.length, load: nowCheck })
         }
     }
 
     for (let item of configs.frontends) {
         nowCheck++
-        if (item.path?.js) {
-            let response = await getFiles(item.path?.js, configs.cemjs.live)
-            var objectURL = URL.createObjectURL(await response.blob());
-            let { frontend } = await import(objectURL)
-            if (frontend) {
-                frontend.name = item.name
-                await load(frontend)
-            }
-        }
-
+        await loadFiles(item.name, item.path?.js, "front")
         if (item.path?.css) {
             nowCheck++
-            let response = await getFiles(item.path?.css, configs.cemjs.live)
-            var objectURL = URL.createObjectURL(await response.blob());
-            let head = document.getElementsByTagName('head')[0];
-            let link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.href = objectURL;
-            head.appendChild(link);
+            await loadFiles(item.name, item.path?.css, "style")
         }
-        if (typeof Services["preloader"]?.progress == "function") {
-            Services["preloader"].progress({ total: files.length, load: nowCheck })
+        if (typeof variable.Services["preloader"]?.progress == "function") {
+            variable.Services["preloader"].progress({ total: files.length, load: nowCheck })
         }
     }
+
     history.pushState({}, '', window.location.pathname);
     window.dispatchEvent(new Event('popstate'));
 }
 
-export { initProject, load, cemConfigs }
+export { initProject, load }

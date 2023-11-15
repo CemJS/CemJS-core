@@ -1,127 +1,82 @@
-import { load, cemConfigs } from './loader'
-import { Frontends, pageFront, Variable } from './class'
-import { getFiles } from './cache'
-
-const loadFront = async function (front, index) {
-
-    let find = cemConfigs.frontends.findIndex(function (item) {
-        return item.name == front;
-    });
-
-    if (find > -1) {
-        let frontData = cemConfigs.frontends[find]
-        if (frontData.path?.css) {
-            let response = await getFiles(frontData.path?.css, cemConfigs.cemjs.live)
-            var objectURL = URL.createObjectURL(await response.blob());
-            let head = document.getElementsByTagName('head')[0];
-            let link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.type = 'text/css';
-            link.href = objectURL;
-            head.appendChild(link);
-        }
-
-        if (frontData.path?.js) {
-            let response = await getFiles(frontData.path?.js, cemConfigs.cemjs.live)
-            var objectURL = URL.createObjectURL(await response.blob());
-            let { frontend } = await import(objectURL)
-            if (frontend) {
-                frontend.name = frontData.name
-                await load(frontend)
-                initFront(front, index)
-            }
-        }
-    }
-}
-
-
-const initFront = async function (front, index) {
-    if (typeof front == "string") {
-        if (Frontends.lists[front]) {
-            Frontends.lists[front].init(index)
-        } else {
-            await loadFront(front)
-        }
-        return
-    }
-    front.map((page, index) => {
-        if (Frontends.lists[page]) {
-            Frontends.lists[page].init(index)
-        } else {
-            loadFront(page, index)
-        }
-    })
-}
+import { variable } from './variable'
+import * as Fn from './fn'
 
 const clearFront = function (front) {
-    pageFront.lists = pageFront.lists.filter((olPage, index) => {
+    variable.pageLists = variable.pageLists.filter((olPage, index) => {
         if (!front.includes(olPage)) {
-            Frontends.lists[olPage]?.$el?.remove()
-            Frontends.lists[olPage].clearData()
+            variable.frontList[olPage]?.$el?.remove()
+            Fn.clearData.bind(variable.frontList[olPage])()
             return false
         }
         return true
     })
-    initFront(front)
+
+    front.map((page, index) => {
+        if (variable.frontList[page]) {
+            Fn.init.bind(variable.frontList[page])(index)
+        }
+    })
 }
 
-const changeUrl = async function (e) {
-    Variable.DataUrl = window.location.pathname.split("/")
-    Variable.DataUrl = Variable.DataUrl.filter(item => item != "")
-    for (let item of cemConfigs.pages) {
+const changeUrl = async function () {
+    variable.Variable.DataUrl = window.location.pathname.split("/")
+    variable.Variable.DataUrl = variable.Variable.DataUrl.filter(item => item != "")
+
+    for (let item of variable.cemConfigs.pages) {
         if (item.regex && window.location.pathname.search(new RegExp(item.regex)) != -1) {
             clearFront(item.front)
         } else if (item.url && item.url == window.location.pathname) {
             clearFront(item.front)
         }
     }
-    if (!pageFront.lists.length) {
-        let find = cemConfigs.pages.findIndex(function (item) {
+
+    if (!variable.pageLists.length) {
+        let find = variable.cemConfigs.pages.findIndex(function (item) {
             return item.url == "/error";
         });
         if (find > -1) {
-            clearFront(cemConfigs.pages[find].front)
+            clearFront(variable.cemConfigs.pages[find].front)
         }
     }
     document.documentElement.scrollIntoView(true)
 }
 
 const clickAny = function (e) {
-    for (let key in Frontends.lists) {
-        if (Frontends.lists[key].$el) {
-            if (Frontends.lists[key]?._ListsOn?.clickAny) {
-                Frontends.lists[key]._ListsOn.clickAny.bind(Frontends.lists[key])(e)
+    for (let key in variable.frontList) {
+        if (variable.frontList[key].$el) {
+            if (variable.frontList[key]?._ListsOn?.clickAny) {
+                variable.frontList[key]._ListsOn.clickAny.bind(variable.frontList[key])(e)
             }
         }
     }
 }
 
 const keydownAny = function (e) {
-    for (let key in Frontends.lists) {
-        if (Frontends.lists[key].$el) {
-            if (Frontends.lists[key]?._ListsOn?.keydownAny) {
-                Frontends.lists[key]._ListsOn.keydownAny.bind(Frontends.lists[key])(e)
+    for (let key in variable.frontList) {
+        if (variable.frontList[key].$el) {
+            if (variable.frontList[key]?._ListsOn?.keydownAny) {
+                variable.frontList[key]._ListsOn.keydownAny.bind(variable.frontList[key])(e)
             }
         }
     }
 }
 
 const keyupAny = function (e) {
-    for (let key in Frontends.lists) {
-        if (Frontends.lists[key].$el) {
-            if (Frontends.lists[key]?._ListsOn?.keyupAny) {
-                Frontends.lists[key]._ListsOn.keyupAny.bind(Frontends.lists[key])(e)
+    for (let key in variable.frontList) {
+        if (variable.frontList[key].$el) {
+            if (variable.frontList[key]?._ListsOn?.keyupAny) {
+                variable.frontList[key]._ListsOn.keyupAny.bind(variable.frontList[key])(e)
             }
         }
     }
 }
 
-const scroll = function (e) {
+const scrollAny = function (e) {
 
-    // for (let key in Frontends.lists) {
-    //     if (Frontends.lists[key].$el) {
-    //         if (Frontends.lists[key]?._ListsOn?.scroll) {
-    //             Frontends.lists[key]._ListsOn.scroll.bind(Frontends.lists[key])(e)
+    // for (let key in variable.frontList) {
+    //     if (variable.frontList[key].$el) {
+    //         if (variable.frontList[key]?._ListsOn?.scroll) {
+    //             variable.frontList[key]._ListsOn.scroll.bind(variable.frontList[key])(e)
     //         }
     //     }
     // }
@@ -133,9 +88,9 @@ const scroll = function (e) {
         bottom: window.scrollY + document.documentElement.clientHeight
     };
 
-    for (let key in Frontends.lists) {
-        if (Frontends.lists[key].$el && Frontends.lists[key]._ListsVisible.length) {
-            Frontends.lists[key]._ListsVisible = Frontends.lists[key]._ListsVisible.filter((item, index) => {
+    for (let key in variable.frontList) {
+        if (variable.frontList[key].$el && variable.frontList[key]._ListsVisible.length) {
+            variable.frontList[key]._ListsVisible = variable.frontList[key]._ListsVisible.filter((item, index) => {
                 let targetPosition = {
                     top: window.scrollY + item.$el.getBoundingClientRect().top,
                     left: window.scrollX + item.$el.getBoundingClientRect().left,
@@ -146,7 +101,7 @@ const scroll = function (e) {
                     targetPosition.top < windowPosition.bottom &&
                     targetPosition.right > windowPosition.left &&
                     targetPosition.left < windowPosition.right) {
-                    item.fn.bind(Frontends.lists[key])(item.$el);
+                    item.fn.bind(variable.frontList[key])(item.$el);
                     return false
                 } else {
                     return true
@@ -158,7 +113,7 @@ const scroll = function (e) {
 
 export const listener = function () {
     window.addEventListener('popstate', changeUrl);
-    window.addEventListener('scroll', scroll);
+    // window.addEventListener('scroll', scrollAny);
     window.addEventListener('click', clickAny);
     document.addEventListener('keydown', keydownAny);
     document.addEventListener('keyup', keyupAny);
