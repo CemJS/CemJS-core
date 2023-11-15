@@ -44,8 +44,8 @@ const changeUrl = async function () {
 const clickAny = function (e) {
     for (let key in variable.frontList) {
         if (variable.frontList[key].$el) {
-            if (variable.frontList[key]?._ListsOn?.clickAny) {
-                variable.frontList[key]._ListsOn.clickAny.bind(variable.frontList[key])(e)
+            if (variable.frontList[key]?.listener?.clickAny) {
+                variable.frontList[key].listener.clickAny(e)
             }
         }
     }
@@ -54,8 +54,8 @@ const clickAny = function (e) {
 const keydownAny = function (e) {
     for (let key in variable.frontList) {
         if (variable.frontList[key].$el) {
-            if (variable.frontList[key]?._ListsOn?.keydownAny) {
-                variable.frontList[key]._ListsOn.keydownAny.bind(variable.frontList[key])(e)
+            if (variable.frontList[key]?.listener?.keydownAny) {
+                variable.frontList[key].listener.keydownAny(e)
             }
         }
     }
@@ -64,8 +64,8 @@ const keydownAny = function (e) {
 const keyupAny = function (e) {
     for (let key in variable.frontList) {
         if (variable.frontList[key].$el) {
-            if (variable.frontList[key]?._ListsOn?.keyupAny) {
-                variable.frontList[key]._ListsOn.keyupAny.bind(variable.frontList[key])(e)
+            if (variable.frontList[key]?.listener?.keyupAny) {
+                variable.frontList[key].listener.keyupAny(e)
             }
         }
     }

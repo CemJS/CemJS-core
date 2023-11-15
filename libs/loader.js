@@ -9,13 +9,6 @@ const load = async function (front) {
     front.Fn = Fn
     front.Variable = variable.Variable
     front.Services = variable.Services
-
-    // front._ListsEventListener = []
-    // front._ListsEventSource = []
-    // front._ListsInit = []
-    // front._ListsVisible = []
-    // front._ListsOn = {}
-
     variable.frontList[front.name] = front
     return
 }
@@ -50,7 +43,7 @@ const loadFiles = async function (name, path, type) {
     if (type == "service") {
         variable.Services[name] = await import(objectURL)
         if (typeof variable.Services[name].loader == "function") {
-            await variable.Services[name].loader(variable.Variable)
+            await variable.Services[name].loader(variable.Variable, Fn)
         }
         return
     }
