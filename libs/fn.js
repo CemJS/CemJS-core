@@ -98,7 +98,7 @@ export const initOne = async function ({ name, data, ifOpen }) {
 export const initAll = async function () {
     for (let key in variable.frontList) {
         if (variable.frontList[key].$el) {
-            variable.frontList[key].init()
+            variable.frontList[key].Fn.init.bind(variable.frontList[key])()
         }
     }
 }
