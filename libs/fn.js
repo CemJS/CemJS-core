@@ -174,8 +174,16 @@ export const clearData = function () {
         clearTimeout(this.Static.setTimeout)
     }
 
-    this.Static = { name: this.name }
-    this.Ref = {}
+    for (let key in this.Static) {
+        delete this.Static[key]
+    }
+
+    for (let key in this.Ref) {
+        delete this.Ref[key]
+    }
+    this.Static.name = this.name
+    // this.Static = { name: this.name }
+    // this.Ref = {}
 
     this._ListsEventListener = this._ListsEventListener.filter((item) => {
         item.$el.removeEventListener(item.name, item.fn)
