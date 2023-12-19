@@ -52,7 +52,8 @@ const setDataElement = function (data, $el, Data) {
     if (!data) { return }
     Object.entries(data).forEach(([name, value]) => {
         if (name.startsWith('on') && name.toLowerCase() in window) {
-            let tmpFn = value.bind(Data)
+            let tmpFn = value
+            // let tmpFn = value.bind(Data)
             $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
             Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
         } else if (name == "ref" || name == "init" || name == "isVisible") {
@@ -63,7 +64,19 @@ const setDataElement = function (data, $el, Data) {
                     value = value.join(" ")
                 }
             }
-            $el.setAttribute(name, value)
+
+            let checkIgnore = false
+            if (name == "disabled" || name == "checked") {
+                checkIgnore = true
+            }
+
+            if (!checkIgnore) {
+                $el.setAttribute(name, value)
+            } else {
+                if (value || typeof value == "number") {
+                    $el.setAttribute(name, value)
+                }
+            }
         }
     })
     return
@@ -91,7 +104,8 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
 
 
         if (name.startsWith('on') && name.toLowerCase() in window && name in newData) {
-            let tmpFn = newData[name].bind(Data)
+            let tmpFn = newData[name]
+            // let tmpFn = newData[name].bind(Data)
 
             $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
             Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
@@ -131,7 +145,21 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                         newData[name] = newData[name].join(" ")
                     }
                 }
-                $el.setAttribute(name, newData[name])
+
+                let checkIgnore = false
+                if (name == "disabled" || name == "checked") {
+                    checkIgnore = true
+                }
+                if (!checkIgnore) {
+                    $el.setAttribute(name, newData[name])
+                } else {
+                    if (newData[name] || typeof newData[name] == "number") {
+                        $el.setAttribute(name, newData[name])
+                    } else {
+                        $el?.removeAttribute(name);
+                    }
+                }
+
             } else {
                 if (name == "value") {
                     $el.value = ""
