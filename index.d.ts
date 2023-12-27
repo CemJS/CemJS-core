@@ -31,6 +31,7 @@ declare namespace front {
         linkChange(link: String): void;
         initAll(): void;
         initOne(name: String, data: front.AnyObj, ifOpen?: any): void;
+        event(url: String, Listener: [any]): any;
     }
 
     type Front = {

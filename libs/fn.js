@@ -195,7 +195,11 @@ export const clearData = function () {
         return false
     })
 
-    this.Events = {}
+    for (let key in this.Events) {
+        delete this.Events[key]
+    }
+
+    // this.Events = {}
     this._ListsVisible = []
 }
 

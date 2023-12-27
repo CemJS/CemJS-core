@@ -18,6 +18,7 @@ class Front_ {
 
 var front = new Front_()
 const Static = front.Static
+const Events = front.Events
 const Ref = front.Ref
 const Func = front.func
 // let Fn = front.Fn
@@ -62,5 +63,8 @@ Fn.clearData = async function () {
     return await front.Fn.clearData.bind(front)()
 }
 
+Fn.event = async function (url, Listener) {
+    return await front.Fn.event.bind(front)(url, Listener)
+}
 
-export { front, Static, Func, Fn, Ref }
+export { front, Static, Func, Fn, Ref, Events }

@@ -4,13 +4,13 @@ class Events {
         this._Listener = Listener
         this.event = new EventSource(url)
         for (let item of this._Listener) {
-            this.event.addEventListener(item.type, item.fn.bind(this))
+            this.event.addEventListener(item.type, item.fn)
         }
     }
 
     addEventListener(type, fn) {
         this._Listener.push({ type, fn })
-        this.event.addEventListener(type, fn.bind(this))
+        this.event.addEventListener(type, fn)
     }
 
     close() {
