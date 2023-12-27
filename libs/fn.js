@@ -47,9 +47,11 @@ export const link = function (e) {
     }
 }
 
-export const linkChange = function (link) {
+export const linkChange = function (link, data = {}) {
     history.pushState({}, '', link);
-    window.dispatchEvent(new Event('popstate'));
+    let e = new Event('popstate')
+    e.data = data
+    window.dispatchEvent(e);
 }
 
 export const initOne = async function (name, data, ifOpen = null) {

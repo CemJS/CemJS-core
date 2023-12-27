@@ -28,7 +28,7 @@ declare namespace front {
     type Fn_ = {
         init(index?: Number): void;
         link(e: any): void;
-        linkChange(link: String): void;
+        linkChange(link: String, data?: any): void;
         initAll(): void;
         initOne(name: String, data: front.AnyObj, ifOpen?: any): void;
         event(url: String, Listener: [any]): any;

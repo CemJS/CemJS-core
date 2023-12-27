@@ -51,8 +51,8 @@ Fn.link = async function (e) {
     return await front.Fn.link.bind(front)(e)
 }
 
-Fn.linkChange = async function (link) {
-    return await front.Fn.linkChange.bind(front)(link)
+Fn.linkChange = async function (link, data = {}) {
+    return await front.Fn.linkChange.bind(front)(link, data)
 }
 
 Fn.initAuto = async function (keys, fn) {
