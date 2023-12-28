@@ -84,7 +84,13 @@ const setDataElement = function (data, $el, Data) {
 
 const setDataElementSvg = function (data, $el) {
     Object.entries(data || {}).forEach(([name, value]) => {
-        $el.setAttributeNS(null, name, value);
+        if (name.startsWith("xmlns")) {
+            $el.setAttributeNS("http://www.w3.org/2000/xmlns/", name, value);
+
+        } else {
+            $el.setAttribute(name, value);
+            // $el.setAttributeNS(null, name, value);
+        }
     })
     return $el
 }
