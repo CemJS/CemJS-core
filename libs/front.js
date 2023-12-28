@@ -4,24 +4,59 @@ class Front_ {
     constructor() {
         this.Static = new Observer(Static, (e) => {
             let keys = e.keyPath.split(".")
+            let newVal = e.object
+            let oldVal = e.oldValue
+            let isChange = false
+            let typ = "Loader/clear"
+
             if (this.$el) {
-                if (this.degubStatic) {
-                    console.log(`${this.name} Action: ${e.action}! Key => ${keys[1]}`);
+                typ = "Action"
+            }
+
+            if (keys.length > 2) {
+                for (let i = 2; i < keys.length; i++) {
+                    newVal = newVal[keys[i]]
                 }
-                if (!this.InitIgnore.includes(keys[1])) {
+            } else {
+                if (typeof newVal == "object") {
+                    newVal = newVal[keys[1]]
+                }
+            }
+
+            if (typeof newVal == "object" && typeof oldVal == "object") {
+                if (JSON.stringify(newVal) != JSON.stringify(oldVal)) {
+                    isChange = true
+                }
+            } else {
+                if (newVal != oldVal) {
+                    isChange = true
+                }
+            }
+
+
+            if (this.degubStatic) {
+                if (isChange) {
+                    console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`, 'Old:', oldVal, "New:", newVal);
+                } else {
+                    console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`);
+                }
+            }
+
+            if (this.$el) {
+                if (!this.InitIgnore.includes(keys[1]) && isChange) {
                     if (this.InitAll.includes(keys[1])) {
                         this.Fn.initAll.bind(this)()
                     } else {
                         this.Fn.init.bind(this)()
-
                     }
                 } else {
-                    console.log("Ignore Init", keys[1])
+                    if (this.degubStatic) {
+                        console.log(`Ignore Init key`, keys[1], "isChange", isChange)
+                    }
                 }
-            } else if (this.degubStatic) {
-                console.log(`${this.name} Loader/clear: ${e.action}! Key => ${keys[1]}`);
             }
         });
+
         this.Variable = {}
         this.Ref = {}
         this.func = {}
