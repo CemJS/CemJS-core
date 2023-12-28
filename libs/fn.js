@@ -184,7 +184,7 @@ export const clearData = function () {
     for (let key in this.Ref) {
         delete this.Ref[key]
     }
-    this.Static.name = this.name
+    // this.Static.name = this.name
     // this.Static = { name: this.name }
     // this.Ref = {}
 

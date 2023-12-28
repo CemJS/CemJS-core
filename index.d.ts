@@ -49,6 +49,7 @@ declare namespace front {
         display(): void;
         degubStatic: boolean;
         InitIgnore: string[];
+        InitAll: string[];
     }
 }
 

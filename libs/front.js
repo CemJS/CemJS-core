@@ -9,7 +9,12 @@ class Front_ {
                     console.log(`${this.name} Action: ${e.action}! Key => ${keys[1]}`);
                 }
                 if (!this.InitIgnore.includes(keys[1])) {
-                    this.Fn.init.bind(this)()
+                    if (this.InitAll.includes(keys[1])) {
+                        this.Fn.initAll.bind(this)()
+                    } else {
+                        this.Fn.init.bind(this)()
+
+                    }
                 } else {
                     console.log("Ignore Init", keys[1])
                 }
@@ -31,7 +36,7 @@ class Front_ {
         this._ListsOn = {}
         this.degubStatic = false
         this.InitIgnore = []
-
+        this.InitAll = []
     }
 }
 
