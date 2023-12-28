@@ -1,6 +1,22 @@
+import Observer from 'deep-observer';
+
 class Front_ {
     constructor() {
-        this.Static = {}
+        this.Static = new Observer(Static, (e) => {
+            let keys = e.keyPath.split(".")
+            if (this.$el) {
+                if (this.degubStatic) {
+                    console.log(`${this.name} Action: ${e.action}! Key => ${keys[1]}`);
+                }
+                if (!this.InitIgnore.includes(keys[1])) {
+                    this.Fn.init.bind(this)()
+                } else {
+                    console.log("Ignore Init", keys[1])
+                }
+            } else if (this.degubStatic) {
+                console.log(`${this.name} Loader/clear: ${e.action}! Key => ${keys[1]}`);
+            }
+        });
         this.Variable = {}
         this.Ref = {}
         this.func = {}
@@ -13,8 +29,24 @@ class Front_ {
         this._ListsInit = []
         this._ListsVisible = []
         this._ListsOn = {}
+        this.degubStatic = false
+        this.InitIgnore = []
+
     }
 }
+
+// const Static = new Observer(front.Static, (e) => {
+//     let keys = e.keyPath.split(".")
+//     // console.log('=e8bc83=', e)
+//     if (front.$el) {
+//         if (front.degubStatic) {
+//             console.log(`Action: ${e.action}! Key => ${keys[1]}`);
+//         }
+//         front.Fn.init.bind(front)()
+//     } else if (front.degubStatic) {
+//         console.log(`Loader: ${e.action}! Key => ${keys[1]}`);
+//     }
+// });
 
 var front = new Front_()
 const Static = front.Static
@@ -22,16 +54,6 @@ const Events = front.Events
 const Ref = front.Ref
 const Func = front.func
 // let Fn = front.Fn
-
-
-let handler = {
-    get: function (target, name) {
-        console.log(target, name)
-        return name in target ? target[name] : "Key does not exist";
-    }
-}
-
-// let Events = front.Events
 
 const Fn = {}
 

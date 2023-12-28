@@ -31,6 +31,7 @@ declare namespace front {
         linkChange(link: String, data?: any): void;
         initAll(): void;
         initOne(name: String, data: front.AnyObj, ifOpen?: any): void;
+        initAuto(key: any, fn?: any): void;
         event(url: String, Listener: [any]): any;
     }
 
@@ -46,6 +47,8 @@ declare namespace front {
         func: any;
         loader(): void;
         display(): void;
+        degubStatic: boolean;
+        InitIgnore: string[];
     }
 }
 

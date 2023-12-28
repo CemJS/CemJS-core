@@ -124,6 +124,7 @@ export const init = async function async(index) {
 }
 
 export const initAuto = function (keys, fn) {
+    return
     const init = this.init.bind(this)
     if (Array.isArray(keys)) {
         for (let item of keys) {
