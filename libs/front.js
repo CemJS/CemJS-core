@@ -6,37 +6,43 @@ class Front_ {
             let keys = e.keyPath.split(".")
             let newVal = e.object
             let oldVal = e.oldValue
-            let isChange = false
+            let isChange = true
             let typ = "Loader/clear"
 
             if (this.$el) {
                 typ = "Action"
             }
 
-            if (keys.length > 2) {
-                for (let i = 2; i < keys.length; i++) {
-                    newVal = newVal[keys[i]]
+            try {
+                if (keys.length > 2) {
+                    for (let i = 2; i < keys.length; i++) {
+                        newVal = newVal[keys[i]]
+                    }
+                } else {
+                    if (typeof newVal == "object") {
+                        newVal = newVal[keys[1]]
+                    }
                 }
-            } else {
-                if (typeof newVal == "object") {
-                    newVal = newVal[keys[1]]
+
+                if (typeof newVal == "object" && typeof oldVal == "object") {
+                    if (JSON.stringify(newVal) == JSON.stringify(oldVal)) {
+                        isChange = false
+                    }
+                } else {
+                    if (newVal == oldVal) {
+                        isChange = false
+                    }
                 }
+            } catch (error) {
+
             }
 
-            if (typeof newVal == "object" && typeof oldVal == "object") {
-                if (JSON.stringify(newVal) != JSON.stringify(oldVal)) {
-                    isChange = true
-                }
-            } else {
-                if (newVal != oldVal) {
-                    isChange = true
-                }
-            }
 
 
             if (this.degubStatic) {
                 if (isChange) {
-                    console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`, 'Old:', oldVal, "New:", newVal);
+                    // console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`, 'Old:', oldVal, "New:", newVal);
+                    console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`, "New:", newVal);
                 } else {
                     console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`);
                 }
