@@ -8,22 +8,16 @@ class Front_ {
             let oldVal = e.oldValue
             let isChange = true
             let typ = "Loader/clear"
-
+            let logArr = [`Front: ${this.name}`]
             if (this.$el) {
                 typ = "Action"
+                logArr.push(`Action: ${e.action}`)
+            } else {
+                logArr.push(`Loader/clear: ${e.action}`)
             }
 
             try {
-                if (keys.length > 2) {
-                    for (let i = 2; i < keys.length; i++) {
-                        newVal = newVal[keys[i]]
-                    }
-                } else {
-                    if (typeof newVal == "object") {
-                        newVal = newVal[keys[1]]
-                    }
-                }
-
+                newVal = e.object[e.name]
                 if (typeof newVal == "object" && typeof oldVal == "object") {
                     if (JSON.stringify(newVal) == JSON.stringify(oldVal)) {
                         isChange = false
@@ -34,18 +28,18 @@ class Front_ {
                     }
                 }
             } catch (error) {
+            }
 
+            logArr.push(`Key =>: ${keys[1]}`)
+
+            if (isChange) {
+                logArr.push('\nOld:', oldVal)
+                logArr.push("\nNew:", newVal)
             }
 
 
-
             if (this.degubStatic) {
-                if (isChange) {
-                    // console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`, 'Old:', oldVal, "New:", newVal);
-                    console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`, "New:", newVal);
-                } else {
-                    console.log(`${this.name} ${typ}: ${e.action}! Key => ${keys[1]}`);
-                }
+                Fn.log(...logArr)
             }
 
             if (this.$el) {
@@ -80,19 +74,6 @@ class Front_ {
         this.InitAll = []
     }
 }
-
-// const Static = new Observer(front.Static, (e) => {
-//     let keys = e.keyPath.split(".")
-//     // console.log('=e8bc83=', e)
-//     if (front.$el) {
-//         if (front.degubStatic) {
-//             console.log(`Action: ${e.action}! Key => ${keys[1]}`);
-//         }
-//         front.Fn.init.bind(front)()
-//     } else if (front.degubStatic) {
-//         console.log(`Loader: ${e.action}! Key => ${keys[1]}`);
-//     }
-// });
 
 var front = new Front_()
 const Static = front.Static
@@ -133,6 +114,19 @@ Fn.clearData = async function () {
 
 Fn.event = async function (url, Listener) {
     return await front.Fn.event.bind(front)(url, Listener)
+}
+
+Fn.log = async function (...params) {
+    let newlog = []
+    for (let item of params) {
+        try {
+            newlog.push(JSON.parse(JSON.stringify(item)))
+        } catch (error) {
+            newlog.push(item)
+        }
+    }
+    console.log(...newlog)
+    return
 }
 
 export { front, Static, Func, Fn, Ref, Events }
