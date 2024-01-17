@@ -58,6 +58,11 @@ const setDataElement = function (data, $el, Data) {
             Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
         } else if (name == "ref" || name == "init" || name == "isVisible") {
             return
+        } else if (name == "html") {
+            try {
+                $el.innerHTML = value
+            } catch (error) { }
+            return
         } else {
             if (typeof value == "object") {
                 if (name == "class") {
@@ -126,6 +131,12 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                         $el.value = ""
                         return
                     }
+                    if (name == "html") {
+                        try {
+                            $el.innerHTML = ""
+                        } catch (error) { }
+                        return
+                    }
                     $el?.removeAttribute(name);
                     return
                 }
@@ -144,6 +155,12 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                 if (name == "value") {
 
                     $el.value = newData[name]
+                    return
+                }
+                if (name == "html") {
+                    try {
+                        $el.innerHTML = newData[name]
+                    } catch (error) { }
                     return
                 }
                 if (typeof newData[name] == "object") {
@@ -169,6 +186,12 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
             } else {
                 if (name == "value") {
                     $el.value = ""
+                    return
+                }
+                if (name == "html") {
+                    try {
+                        $el.innerHTML = ""
+                    } catch (error) { }
                     return
                 }
 
