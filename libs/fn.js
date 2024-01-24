@@ -86,7 +86,7 @@ export const initAll = async function () {
 }
 
 
-export const init = async function async(index) {
+export const init = async function (index) {
     if (this.listener.start) {
         this.listener.start()
     }

@@ -1,7 +1,7 @@
 import { variable } from './variable'
 import * as Fn from './fn'
 
-const clearFront = function (front, data = null) {
+const clearFront = async function (front, data = null) {
     variable.pageLists = variable.pageLists.filter((olPage, index) => {
         if (!front.includes(olPage)) {
             variable.frontList[olPage]?.$el?.remove()
@@ -11,14 +11,26 @@ const clearFront = function (front, data = null) {
         return true
     })
 
-    front.map((page, index) => {
+
+    let index = 0
+    for (let page of front) {
         if (variable.frontList[page]) {
             if (data && typeof data == "object") {
                 Object.assign(variable.frontList[page].Static, data)
             }
-            Fn.init.bind(variable.frontList[page])(index)
+            await Fn.init.bind(variable.frontList[page])(index)
         }
-    })
+        index++
+    }
+
+    // front.map((page, index) => {
+    //     if (variable.frontList[page]) {
+    //         if (data && typeof data == "object") {
+    //             Object.assign(variable.frontList[page].Static, data)
+    //         }
+    //         Fn.init.bind(variable.frontList[page])(index)
+    //     }
+    // })
 }
 
 const changeUrl = async function (e) {
