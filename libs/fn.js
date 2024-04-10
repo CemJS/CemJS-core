@@ -47,9 +47,11 @@ export const link = function (e) {
     }
 }
 
-export const linkChange = function (link) {
+export const linkChange = function (link, data = {}) {
     history.pushState({}, '', link);
-    window.dispatchEvent(new Event('popstate'));
+    let e = new Event('popstate')
+    e.data = data
+    window.dispatchEvent(e);
 }
 
 export const initOne = async function (name, data, ifOpen = null) {
@@ -84,7 +86,7 @@ export const initAll = async function () {
 }
 
 
-export const init = async function async(index) {
+export const init = async function (index) {
     if (this.listener.start) {
         this.listener.start()
     }
@@ -122,6 +124,7 @@ export const init = async function async(index) {
 }
 
 export const initAuto = function (keys, fn) {
+    return
     const init = this.init.bind(this)
     if (Array.isArray(keys)) {
         for (let item of keys) {
@@ -174,8 +177,16 @@ export const clearData = function () {
         clearTimeout(this.Static.setTimeout)
     }
 
-    this.Static = { name: this.name }
-    this.Ref = {}
+    for (let key in this.Static) {
+        delete this.Static[key]
+    }
+
+    for (let key in this.Ref) {
+        delete this.Ref[key]
+    }
+    // this.Static.name = this.name
+    // this.Static = { name: this.name }
+    // this.Ref = {}
 
     this._ListsEventListener = this._ListsEventListener.filter((item) => {
         item.$el.removeEventListener(item.name, item.fn)
@@ -187,7 +198,11 @@ export const clearData = function () {
         return false
     })
 
-    this.Events = {}
+    for (let key in this.Events) {
+        delete this.Events[key]
+    }
+
+    // this.Events = {}
     this._ListsVisible = []
 }
 

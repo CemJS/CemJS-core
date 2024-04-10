@@ -17,7 +17,7 @@ const loadFiles = async function (name, path, type) {
     if (!path) {
         return
     }
-
+    path += "&core=" + variable.cemConfigs?.cemjs?.version
     let response = await getFiles(path);
     var objectURL = URL.createObjectURL(await response.blob());
 

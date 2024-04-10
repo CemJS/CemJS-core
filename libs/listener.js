@@ -1,7 +1,7 @@
 import { variable } from './variable'
 import * as Fn from './fn'
 
-const clearFront = function (front) {
+const clearFront = async function (front, data = null) {
     variable.pageLists = variable.pageLists.filter((olPage, index) => {
         if (!front.includes(olPage)) {
             variable.frontList[olPage]?.$el?.remove()
@@ -11,22 +11,37 @@ const clearFront = function (front) {
         return true
     })
 
-    front.map((page, index) => {
+
+    let index = 0
+    for (let page of front) {
         if (variable.frontList[page]) {
-            Fn.init.bind(variable.frontList[page])(index)
+            if (data && typeof data == "object") {
+                Object.assign(variable.frontList[page].Static, data)
+            }
+            await Fn.init.bind(variable.frontList[page])(index)
         }
-    })
+        index++
+    }
+
+    // front.map((page, index) => {
+    //     if (variable.frontList[page]) {
+    //         if (data && typeof data == "object") {
+    //             Object.assign(variable.frontList[page].Static, data)
+    //         }
+    //         Fn.init.bind(variable.frontList[page])(index)
+    //     }
+    // })
 }
 
-const changeUrl = async function () {
+const changeUrl = async function (e) {
     variable.Variable.DataUrl = window.location.pathname.split("/")
     variable.Variable.DataUrl = variable.Variable.DataUrl.filter(item => item != "")
 
     for (let item of variable.cemConfigs.pages) {
         if (item.regex && window.location.pathname.search(new RegExp(item.regex)) != -1) {
-            clearFront(item.front)
+            clearFront(item.front, e.data)
         } else if (item.url && item.url == window.location.pathname) {
-            clearFront(item.front)
+            clearFront(item.front, e.data)
         }
     }
 
@@ -35,7 +50,7 @@ const changeUrl = async function () {
             return item.url == "/error";
         });
         if (find > -1) {
-            clearFront(variable.cemConfigs.pages[find].front)
+            clearFront(variable.cemConfigs.pages[find].front, e.data)
         }
     }
     document.documentElement.scrollIntoView(true)

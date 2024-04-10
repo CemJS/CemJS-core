@@ -28,9 +28,12 @@ declare namespace front {
     type Fn_ = {
         init(index?: Number): void;
         link(e: any): void;
-        linkChange(link: String): void;
+        linkChange(link: String, data?: any): void;
         initAll(): void;
         initOne(name: String, data: front.AnyObj, ifOpen?: any): void;
+        initAuto(key: any, fn?: any): void;
+        event(url: String, Listener: [any]): any;
+        log(...params: any): void;
     }
 
     type Front = {
@@ -45,6 +48,9 @@ declare namespace front {
         func: any;
         loader(): void;
         display(): void;
+        degubStatic: boolean;
+        InitIgnore: string[];
+        InitAll: string[];
     }
 }
 

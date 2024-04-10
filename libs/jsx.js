@@ -52,10 +52,16 @@ const setDataElement = function (data, $el, Data) {
     if (!data) { return }
     Object.entries(data).forEach(([name, value]) => {
         if (name.startsWith('on') && name.toLowerCase() in window) {
-            let tmpFn = value.bind(Data)
+            let tmpFn = value
+            // let tmpFn = value.bind(Data)
             $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
             Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
         } else if (name == "ref" || name == "init" || name == "isVisible") {
+            return
+        } else if (name == "html") {
+            try {
+                $el.innerHTML = value
+            } catch (error) { }
             return
         } else {
             if (typeof value == "object") {
@@ -63,7 +69,19 @@ const setDataElement = function (data, $el, Data) {
                     value = value.join(" ")
                 }
             }
-            $el.setAttribute(name, value)
+
+            let checkIgnore = false
+            if (name == "disabled" || name == "checked" || name == "selected") {
+                checkIgnore = true
+            }
+
+            if (!checkIgnore) {
+                $el.setAttribute(name, value)
+            } else {
+                if (value || typeof value == "number") {
+                    $el.setAttribute(name, value)
+                }
+            }
         }
     })
     return
@@ -71,7 +89,13 @@ const setDataElement = function (data, $el, Data) {
 
 const setDataElementSvg = function (data, $el) {
     Object.entries(data || {}).forEach(([name, value]) => {
-        $el.setAttributeNS(null, name, value);
+        if (name.startsWith("xmlns")) {
+            $el.setAttributeNS("http://www.w3.org/2000/xmlns/", name, value);
+
+        } else {
+            $el.setAttribute(name, value);
+            // $el.setAttributeNS(null, name, value);
+        }
     })
     return $el
 }
@@ -91,7 +115,8 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
 
 
         if (name.startsWith('on') && name.toLowerCase() in window && name in newData) {
-            let tmpFn = newData[name].bind(Data)
+            let tmpFn = newData[name]
+            // let tmpFn = newData[name].bind(Data)
 
             $el.addEventListener(name.toLowerCase().substring(2), tmpFn)
             Data._ListsEventListener.push({ $el, name: name.toLowerCase().substring(2), fn: tmpFn })
@@ -104,6 +129,12 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                 if (!newData[name]) {
                     if (name == "value") {
                         $el.value = ""
+                        return
+                    }
+                    if (name == "html") {
+                        try {
+                            $el.innerHTML = ""
+                        } catch (error) { }
                         return
                     }
                     $el?.removeAttribute(name);
@@ -126,15 +157,41 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                     $el.value = newData[name]
                     return
                 }
+                if (name == "html") {
+                    try {
+                        $el.innerHTML = newData[name]
+                    } catch (error) { }
+                    return
+                }
                 if (typeof newData[name] == "object") {
                     if (name == "class") {
                         newData[name] = newData[name].join(" ")
                     }
                 }
-                $el.setAttribute(name, newData[name])
+
+                let checkIgnore = false
+                if (name == "disabled" || name == "checked" || name == "selected") {
+                    checkIgnore = true
+                }
+                if (!checkIgnore) {
+                    $el.setAttribute(name, newData[name])
+                } else {
+                    if (newData[name] || typeof newData[name] == "number") {
+                        $el.setAttribute(name, newData[name])
+                    } else {
+                        $el?.removeAttribute(name);
+                    }
+                }
+
             } else {
                 if (name == "value") {
                     $el.value = ""
+                    return
+                }
+                if (name == "html") {
+                    try {
+                        $el.innerHTML = ""
+                    } catch (error) { }
                     return
                 }
 
