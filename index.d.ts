@@ -48,6 +48,7 @@ declare namespace front {
         func: any;
         loader(): void;
         display(): void;
+        destroy?(): void;
         degubStatic: boolean;
         InitIgnore: string[];
         InitAll: string[];

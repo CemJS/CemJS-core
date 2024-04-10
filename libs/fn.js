@@ -163,7 +163,10 @@ export const initAuto = function (keys, fn) {
     }
 }
 
-export const clearData = function () {
+export const clearData = async function () {
+    if (this.destroy) {
+        await this.destroy()
+    }
     this?.$el?.remove()
     delete this.$el
     delete this._VDomNew
