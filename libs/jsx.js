@@ -71,7 +71,7 @@ const setDataElement = function (data, $el, Data) {
             }
 
             let checkIgnore = false
-            if (name == "disabled" || name == "checked") {
+            if (name == "disabled" || name == "checked" || name == "selected") {
                 checkIgnore = true
             }
 
@@ -170,7 +170,7 @@ const updateDataElement = function ($el, newData = {}, oldData = {}, Data) {
                 }
 
                 let checkIgnore = false
-                if (name == "disabled" || name == "checked") {
+                if (name == "disabled" || name == "checked" || name == "selected") {
                     checkIgnore = true
                 }
                 if (!checkIgnore) {
