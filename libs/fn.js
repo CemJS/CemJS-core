@@ -163,6 +163,13 @@ export const initAuto = function (keys, fn) {
     }
 }
 
+export const clearDataAll = async function () {
+    for (let frontName of variable.pageLists) {
+        variable.frontList[frontName]?.Fn?.clearData.bind(variable.frontList[frontName])()
+    }
+    return
+}
+
 export const clearData = async function () {
     if (this.destroy) {
         await this.destroy()
